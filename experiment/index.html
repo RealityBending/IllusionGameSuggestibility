@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Title shown in tab -->
+        <title>Illusion Game</title>
+
+        <!-- Load all necessary plugins -->
+        <script src="https://unpkg.com/jspsych"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-fullscreen"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-preload"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-html-button-response"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response"></script>
+
+        <!-- Load Illusion Game scripts -->
+        <script src="https://realitybending.github.io/IllusionGame/v3/stimuli/stimuli_training.js"></script>
+
+        <!-- <script src="v3/stimuli/stimuli_training.js"></script> -->
+        <script src="https://realitybending.github.io/IllusionGame/v3/stimuli/stimuli_part1.js"></script>
+        <script src="https://realitybending.github.io/IllusionGame/v3/stimuli/stimuli_part2.js"></script>
+        <script src="https://realitybending.github.io/IllusionGame/v3/IllusionGame.js"></script>
+
+        <link
+            href="https://unpkg.com/jspsych/css/jspsych.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <style>
+            /* set canvas to be full screen */
+            .jspsych-content {
+                max-width: 100%;
+            }
+
+            /*Hide scrollbar while keeping it functional */
+            body {
+                overflow-y: scroll;
+            }
+
+            Body::-webkit-scrollbar {
+                display: none;
+            }
+        </style>
+    </head>
+
+    <body></body>
+
+    <script>
+        // Initialize experiment =================================================
+        var timeline = []
+
+        var jsPsych = initJsPsych({
+            on_finish: function () {
+                // Display data in browser (useful for debugging)
+                jsPsych.data.displayData("json")
+            },
+        })
+
+        // Enter fullscreen mode
+        timeline.push({
+            type: jsPsychFullscreen,
+            fullscreen_mode: true,
+            delay_after: 0,
+        })
+
+        // Illusion Game =======================================================
+
+        // Practice ------------------------------------------------------------
+
+        // timeline.push({
+        //     timeline: [
+        //         IG_instructions,
+        //         { timeline: ebbinghaus_practice },
+        //         { timeline: mullerlyer_practice },
+        //         { timeline: verticalhorizontal_practice },
+        //         IG_practice_end,
+        //     ],
+        // })
+
+        // Task Blocks -----------------------------------------------------------------
+
+        // Randomize order of the 2 parts
+        for (var task of jsPsych.randomization.shuffleNoRepeats([
+            IG_create_block(stimuli_part1, (show_marker = false)),
+            IG_create_block(stimuli_part2, (show_marker = false)),
+        ])) {
+            timeline.push(task)
+        }
+
+        // End =================================================================
+        // Exit fullscreen mode
+        timeline.push({
+            type: jsPsychFullscreen,
+            fullscreen_mode: false,
+        })
+
+        /* ----------------- Run the timeline ----------------- */
+        jsPsych.run(timeline)
+        // jsPsych.simulate(timeline, "visual")
+        // jsPsych.simulate(timeline, "data-only")
+    </script>
+</html>
