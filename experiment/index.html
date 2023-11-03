@@ -4,20 +4,33 @@
         <!-- Title shown in tab -->
         <title>Illusion Game</title>
 
-        <!-- Load all necessary plugins -->
+        <!-- Load plugins used in Demographics -->
+        <script src="https://unpkg.com/jspsych"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-browser-check"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-survey-text"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-html-button-response"></script>
+
+        <!-- Load plugins used in Questionnaires -->
+        <script src="https://unpkg.com/@jspsych/plugin-survey-likert"></script>
+        <script src="https://realitybending.github.io/JSmisc/jspsych_extensions/plugin-multiple-slider.js"></script>
+
+        <!-- Load plugins used in Illusion Game -->
         <script src="https://unpkg.com/jspsych"></script>
         <script src="https://unpkg.com/@jspsych/plugin-fullscreen"></script>
         <script src="https://unpkg.com/@jspsych/plugin-preload"></script>
         <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response"></script>
-        <script src="https://unpkg.com/@jspsych/plugin-html-button-response"></script>
         <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response"></script>
+
+        <!-- Load scripts -->
+        <script src="demographics.js"></script>
+        <script src="questionnaires.js"></script>
 
         <!-- Load Illusion Game scripts -->
         <script src="https://realitybending.github.io/IllusionGame/v3/stimuli/stimuli_training.js"></script>
-
-        <!-- <script src="v3/stimuli/stimuli_training.js"></script> -->
         <script src="https://realitybending.github.io/IllusionGame/v3/stimuli/stimuli_part1.js"></script>
         <script src="https://realitybending.github.io/IllusionGame/v3/stimuli/stimuli_part2.js"></script>
+        <script src="https://realitybending.github.io/IllusionGame/v3/instructions.js"></script>
         <script src="https://realitybending.github.io/IllusionGame/v3/IllusionGame.js"></script>
 
         <link
@@ -56,42 +69,38 @@
         })
 
         // Enter fullscreen mode
-        timeline.push({
-            type: jsPsychFullscreen,
-            fullscreen_mode: true,
-            delay_after: 0,
-        })
+        // timeline.push({
+        //     type: jsPsychFullscreen,
+        //     fullscreen_mode: true,
+        //     delay_after: 0,
+        // })
+
+        // Demographics ========================================================
+        // timeline.push(demographics_consent)
+        // timeline.push(demographics_browser_info)
+        // timeline.push(demographics_info)
+
+        // Questionnaires ======================================================
+        timeline.push(ipip6_questionnaire)
+        timeline.push(pid5_questionnaire)
 
         // Illusion Game =======================================================
 
-        // Practice ------------------------------------------------------------
-
-        // timeline.push({
-        //     timeline: [
-        //         IG_instructions,
-        //         { timeline: ebbinghaus_practice },
-        //         { timeline: mullerlyer_practice },
-        //         { timeline: verticalhorizontal_practice },
-        //         IG_practice_end,
-        //     ],
-        // })
-
-        // Task Blocks -----------------------------------------------------------------
-
-        // Randomize order of the 2 parts
-        for (var task of jsPsych.randomization.shuffleNoRepeats([
-            IG_create_block(stimuli_part1, (show_marker = false)),
-            IG_create_block(stimuli_part2, (show_marker = false)),
-        ])) {
-            timeline.push(task)
-        }
+        // timeline.push(ig_practice)
+        // // Randomize order of the 2 parts
+        // for (var task of jsPsych.randomization.shuffleNoRepeats([
+        //     IG_create_block(stimuli_part1, (show_marker = false)),
+        //     IG_create_block(stimuli_part2, (show_marker = false)),
+        // ])) {
+        //     timeline.push(task)
+        // }
 
         // End =================================================================
         // Exit fullscreen mode
-        timeline.push({
-            type: jsPsychFullscreen,
-            fullscreen_mode: false,
-        })
+        // timeline.push({
+        //     type: jsPsychFullscreen,
+        //     fullscreen_mode: false,
+        // })
 
         /* ----------------- Run the timeline ----------------- */
         jsPsych.run(timeline)
