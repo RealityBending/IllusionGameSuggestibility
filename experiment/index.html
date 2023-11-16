@@ -15,6 +15,7 @@
             rel="stylesheet"
             href="https://unpkg.com/@jspsych/plugin-survey/css/survey.css"
         />
+        <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.3"></script>
 
         <!-- Load plugins used in Questionnaires -->
         <script src="https://unpkg.com/@jspsych/plugin-survey-likert"></script>
@@ -119,6 +120,14 @@
         timeline.push({
             type: jsPsychFullscreen,
             fullscreen_mode: false,
+        })
+        // Save data via DataPipe
+        timeline.push({
+            type: jsPsychPipe,
+            action: "save",
+            experiment_id: "pnAaGIkS01IF", // This in generated in the DataPipe interface
+            filename: `${jsPsych.randomization.randomID(10)}.csv`,
+            data_string: () => jsPsych.data.get().csv(),
         })
 
         /* ----------------- Run the timeline ----------------- */
