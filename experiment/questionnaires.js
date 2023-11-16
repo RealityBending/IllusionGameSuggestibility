@@ -110,9 +110,104 @@ var pid_dimensions = [
     "Antagonism_25",
 ]
 
+// Short Suggestibility Scale (SSS  21 items; Kotov, Bellman & Watson, 2004)
+// From the Multidimensional Iowa Suggestibility Scale (MISS)
+var sss_items = [
+    "I am easily influenced by other people's opinions",
+    "I can be influenced by a good commercial",
+    "When someone coughs or sneezes, I usually feel the urge to do the same",
+    "Imagining a refreshing drink can make me thirsty",
+    "A good salesperson can really make me want their product",
+    "I get a lot of good practical advice from magazines or TV",
+    "If a product is nicely displayed, I usually want to buy it",
+    "When I see someone shiver, I often feel a chill myself",
+    "I get my style from certain celebrities",
+    "When people tell me how they feel, I often notice that I feel the same way",
+    "When making a decision, I often follow other people's advice",
+    "Reading descriptions of tasty dishes can make my mouth water",
+    "I get many good ideas from others",
+    "I frequently change my opinion after talking with others",
+    "After I see a commercial for lotion, sometimes my skin feels dry",
+    "I discovered many of my favorite things through my friends",
+    "I follow current fashion trends",
+    "Thinking about something scary can make my heart pound",
+    "I have picked-up many habits from my friends",
+    "If I am told I don't look well, I start feeling ill",
+    "It is important for me to fit in",
+]
+
+var sss_dimensions = [
+    "SSS_1",
+    "SSS_2",
+    "SSS_3",
+    "SSS_4",
+    "SSS_5",
+    "SSS_6",
+    "SSS_7",
+    "SSS_8",
+    "SSS_9",
+    "SSS_10",
+    "SSS_11",
+    "SSS_12",
+    "SSS_13",
+    "SSS_14",
+    "SSS_15",
+    "SSS_16",
+    "SSS_17",
+    "SSS_18",
+    "SSS_19",
+    "SSS_20",
+    "SSS_21",
+]
+
+// MIST-16 (Maertens et al., 2023)
+// We recommend to calculate and report all five scores of the Verification done framework:
+// - V (Veracity Discernment): V can be calculated by scoring each of the responses on a binary 0 (incorrect) or 1 (correct) metric and taking the sum of the score.
+// - r (Real News Detection): The sum of all scores for the real news items results in the r score.
+// - f (Fake News Detection): The sum of all scores for the fake news items results in the f score.
+// - d (Distrust): To calculate d, all responses must be scored on a binary 0 (not fake news) or 1 (fake news) metric, independent of whether the response is correct or incorrect. The sum of this amount of fake news judgements should then be subtracted by 10 (MIST-20), 8 (MIST-16), or 4 (MIST-8), and this results in the distrust score. If the resulting score is below 0, the score should be corrected to 0.
+// - n (Naïvité): To calculate n, all responses must be scored on a binary 0 (not real news) or 1 (real news), independent of whether the response is correct or incorrect. The sum of this amount of real news judgements should then be subtracted by 10 (MIST-20), 8 (MIST-16), or 4 (MIST-8), and this results in the naïvité score. If the resulting score is below 0, the score should be corrected to 0.
+var mist_items = [
+    "Morocco's King Appoints Committee Chief to Fight Poverty and Inequality",
+    "US Hispanic Population Reached New High in 2018, But Growth Has Slowed",
+    "Hyatt Will Remove Small Bottles from Hotel Bathrooms",
+    "Taiwan Seeks to Join Fight Against Global Warming",
+    "About a Quarter of Large US Newspapers Laid off Staff in 2018",
+    "Majority in US Still Want Abortion Legal, with Limits",
+    "Most Americans Say It's OK for Professional Athletes to Speak out Publicly about Politics",
+    "United Nations Gets Mostly Positive Marks from People Around the World",
+    "The Government Is Knowingly Spreading Disease Through the Airwaves and Food Supply",
+    "The Government Is Actively Destroying Evidence Related to the JFK Assassination",
+    "Government Officials Have Manipulated Stock Prices to Hide Scandals",
+    "A Small Group of People Control the World Economy by Manipulating the Price of Gold and Oil",
+    "The Government Is Conducting a Massive Cover-Up of Their Involvement in 9/11",
+    "New Study: Left-Wingers Are More Likely to Lie to Get a Higher Salary",
+    "Climate Scientists' Work Is 'Unreliable', a 'Deceptive Method of Communication'",
+    "Left-Wingers Are More Likely to Lie to Get a Good Grade",
+]
+
+let mist_dimensions = [
+    "MIST_Real_A_1",
+    "MIST_Real_A_2",
+    "MIST_Real_A_3",
+    "MIST_Real_A_4",
+    "MIST_Real_A_5",
+    "MIST_Real_B_6",
+    "MIST_Real_B_7",
+    "MIST_Real_B_8",
+    "MIST_Fake_C_9",
+    "MIST_Fake_C_10",
+    "MIST_Fake_C_11",
+    "MIST_Fake_C_12",
+    "MIST_Fake_C_13",
+    "MIST_Fake_D_14",
+    "MIST_Fake_D_15",
+    "MIST_Fake_D_16",
+]
+
 // Questionnaires =================================================
 
-// Format IPIP6 items
+// Format IPIP6 items ------------------------------------------------
 function format_questions_analog(
     items,
     dimensions,
@@ -149,7 +244,7 @@ var ipip6_questionnaire = {
     },
 }
 
-// Format PID-5 items
+// Format PID-5 items ------------------------------------------------
 var pid_questions = []
 for (const [index, element] of pid_items.entries()) {
     pid_questions.push({
@@ -179,4 +274,66 @@ var pid5_questionnaire = {
     data: {
         screen: "questionnaire_pid5",
     },
+}
+
+// SSS ----------------------------------------------------------------
+var sss_questions = []
+for (const [index, element] of sss_items.entries()) {
+    sss_questions.push({
+        prompt: "<b>" + element + "</b>",
+        name: sss_dimensions[index],
+        labels: [
+            "Not at all or very slightly",
+            "A little",
+            "Somewhat",
+            "Quite a bit",
+            "A lot",
+        ],
+        required: false,
+    })
+}
+
+var sss_questionaire = {
+    type: jsPsychSurveyLikert,
+    questions: sss_questions,
+    randomize_question_order: true,
+    preamble:
+        "<p><b>About your sensitivity and adaptability...</b></p>" +
+        "<p>Please indicate to what extent the following statements apply to you.</p>",
+    require_movement: false,
+    slider_width: 700,
+    data: {
+        screen: "questionnaire_sss",
+    },
+}
+
+// MIST ----------------------------------------------------------------
+var mist_questions = []
+for (const [index, element] of mist_items.entries()) {
+    mist_questions.push({
+        prompt: element,
+        name: mist_dimensions[index],
+    })
+}
+
+var mist_questionaire = {
+    type: jsPsychSurvey,
+    pages: [
+        [
+            {
+                type: "html",
+                prompt:
+                    "<p><b>Please categorize the following news headlines as either 'Fake News' or'Real News'.</b></p>" +
+                    "<p><i>Some items may look credible or obviously false at first sight, but may actually fall in the opposite category. However, for each news headline, only one category is correct.</i></p>",
+            },
+            {
+                type: "likert-table",
+                prompt: " ",
+                statements: () => jsPsych.randomization.shuffle(mist_questions),
+                options: ["Real", "Fake"],
+
+                required: true,
+            },
+        ],
+    ],
 }

@@ -10,13 +10,17 @@
         <script src="https://unpkg.com/@jspsych/plugin-survey-text"></script>
         <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice"></script>
         <script src="https://unpkg.com/@jspsych/plugin-html-button-response"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-survey"></script>
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/@jspsych/plugin-survey/css/survey.css"
+        />
 
         <!-- Load plugins used in Questionnaires -->
         <script src="https://unpkg.com/@jspsych/plugin-survey-likert"></script>
         <script src="https://realitybending.github.io/JSmisc/jspsych_extensions/plugin-multiple-slider.js"></script>
 
         <!-- Load plugins used in Illusion Game -->
-        <script src="https://unpkg.com/jspsych"></script>
         <script src="https://unpkg.com/@jspsych/plugin-fullscreen"></script>
         <script src="https://unpkg.com/@jspsych/plugin-preload"></script>
         <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response"></script>
@@ -69,38 +73,52 @@
         })
 
         // Enter fullscreen mode
-        // timeline.push({
-        //     type: jsPsychFullscreen,
-        //     fullscreen_mode: true,
-        //     delay_after: 0,
-        // })
+        timeline.push({
+            type: jsPsychFullscreen,
+            fullscreen_mode: true,
+            delay_after: 0,
+        })
 
         // Demographics ========================================================
-        // timeline.push(demographics_consent)
-        // timeline.push(demographics_browser_info)
-        // timeline.push(demographics_info)
+        timeline.push(demographics_consent)
+        timeline.push(demographics_browser_info)
+        timeline.push(demographics_info)
 
         // Questionnaires ======================================================
-        timeline.push(ipip6_questionnaire)
-        timeline.push(pid5_questionnaire)
+        var Qs = [
+            ipip6_questionaire,
+            pid5_questionaire,
+            sss_questionaire,
+            mist_questionaire,
+        ]
+        Qs = jsPsych.randomization.shuffle(Qs) // Randomize order
+
+        // Start with first questionnaire
+        timeline.push(Qs[0])
+        timeline.push(Qs[1])
 
         // Illusion Game =======================================================
 
-        // timeline.push(ig_practice)
-        // // Randomize order of the 2 parts
-        // for (var task of jsPsych.randomization.shuffleNoRepeats([
-        //     IG_create_block(stimuli_part1, (show_marker = false)),
-        //     IG_create_block(stimuli_part2, (show_marker = false)),
-        // ])) {
-        //     timeline.push(task)
-        // }
+        // Randomize order of the 2 parts
+        var ig_parts = [
+            IG_create_block(stimuli_part1, (show_marker = false)),
+            IG_create_block(stimuli_part2, (show_marker = false)),
+        ]
+        igs = jsPsych.randomization.shuffle(ig_parts)
+
+        // Add to timeline
+        timeline.push(ig_practice)
+        timeline.push(ig_parts[0])
+        timeline.push(Qs[2])
+        timeline.push(ig_parts[1])
+        timeline.push(Qs[3])
 
         // End =================================================================
         // Exit fullscreen mode
-        // timeline.push({
-        //     type: jsPsychFullscreen,
-        //     fullscreen_mode: false,
-        // })
+        timeline.push({
+            type: jsPsychFullscreen,
+            fullscreen_mode: false,
+        })
 
         /* ----------------- Run the timeline ----------------- */
         jsPsych.run(timeline)

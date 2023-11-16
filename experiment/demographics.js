@@ -62,14 +62,13 @@ var demographics_consent = {
         "<img src='https://blogs.brighton.ac.uk/sussexwrites/files/2019/06/University-of-Sussex-logo-transparent.png' width='150px' align='right'/><br><br><br><br><br>" +
         // Title
         "<h1>Informed Consent</h1>" +
-        "<p align='left'>Thank you for considering participating in our research. This study contains [TO BE COMPLETED].</p>" +
-        "<p align='left'>Your participation in this research will be kept completely confidential. Your responses are entirely anonymous, and no IP address or any identifiers is collected.</p>" +
-        "<p align='left'><b>By participating, you agree to follow the instructions and provide honest answers.</b> If you do not wish to participate this survey, simply close your browser.</p>" +
+        "<p align='left'>In this study, you will be asked to complete a few questionnaires and perform some tests to see how fast you are. The goal is to study how Humans are impacted by visual illusions.</p>" +
+        "<p align='left'>Your participation in this research will be kept completely confidential. <b>Your responses are entirely anonymous</b>, and no IP address or any identifiers are collected.</p>" +
+        "<p align='left'>Your participation contributes to scientific advancement. <b>By participating, you agree to follow the instructions and provide honest answers.</b> If you do not wish to participate this survey, simply close your browser.</p>" +
         // "<p>Please note that various checks will be performed to ensure the validity of the data.<br>We reserve the right to return your participation or prorate reimbursement should we detect non-valid responses (e.g., random pattern of answers, instructions not read, ...).</p>"
+        "<p align='left'><br><sub><sup>If you have any questions about the project, please contact D.Makowski@sussex.ac.uk. This project has been reviewed and approved by the Ethics Comitee of the University of Sussex (XXXX).</sup></sub></p>",
 
-        "<p align='left'><br><sub><sup>If you have any questions about the project, please contact D.Makowski@sussex.ac.uk. This project has been reviewed and approved by the Ethics Comitee of the University of Sussex (TODO).</sup></sub></p>",
-
-    choices: ["I consent"],
+    choices: ["I read and consent"],
     data: { screen: "consent" },
 }
 
