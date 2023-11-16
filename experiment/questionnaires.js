@@ -293,7 +293,7 @@ for (const [index, element] of sss_items.entries()) {
     })
 }
 
-var sss_questionaire = {
+var sss_questionnaire = {
     type: jsPsychSurveyLikert,
     questions: sss_questions,
     randomize_question_order: true,
@@ -316,7 +316,7 @@ for (const [index, element] of mist_items.entries()) {
     })
 }
 
-var mist_questionaire = {
+var mist_questionnaire = {
     type: jsPsychSurvey,
     pages: [
         [
