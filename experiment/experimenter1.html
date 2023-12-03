@@ -44,18 +44,13 @@
             type="text/css"
         />
         <style>
-            /* set canvas to be full screen */
+            /* set canvas to be full screen by default */
             .jspsych-content {
                 max-width: 100%;
             }
-
-            /*Hide scrollbar while keeping it functional */
-            body {
-                overflow-y: scroll;
-            }
-
-            Body::-webkit-scrollbar {
-                display: none;
+            /* Narrower text needed in some screens */
+            .narrow-text {
+                max-width: 50%;
             }
         </style>
     </head>
@@ -68,8 +63,10 @@
 
         var jsPsych = initJsPsych({
             on_finish: function () {
-                // Display data in browser (useful for debugging)
-                jsPsych.data.displayData("json")
+                jsPsych.data.addProperties({
+                    experimenter: "Experimenter1",
+                })
+                // jsPsych.data.displayData("json") // Display data in browser
             },
         })
 
@@ -98,6 +95,9 @@
         timeline.push(Qs[0])
         timeline.push(Qs[1])
 
+        timeline.push(Qs[2])
+        timeline.push(Qs[3])
+
         // Illusion Game =======================================================
 
         // Randomize order of the 2 parts
@@ -115,12 +115,8 @@
         timeline.push(Qs[3])
 
         // End =================================================================
-        timeline.push(demographics_endscreen)
-        // Exit fullscreen mode
-        timeline.push({
-            type: jsPsychFullscreen,
-            fullscreen_mode: false,
-        })
+        timeline.push(demographics_waitdatasaving)
+
         // Save data via DataPipe
         timeline.push({
             type: jsPsychPipe,
@@ -129,6 +125,18 @@
             filename: `${jsPsych.randomization.randomID(10)}.csv`,
             data_string: () => jsPsych.data.get().csv(),
         })
+
+        // Exit fullscreen mode
+        timeline.push({
+            type: jsPsychFullscreen,
+            fullscreen_mode: false,
+        })
+
+        timeline.push(
+            demographics_endscreen(
+                "https://realitybending.github.io/IllusionGameSuggestibility/experiment/experimenter1.html"
+            )
+        )
 
         /* ----------------- Run the timeline ----------------- */
         jsPsych.run(timeline)

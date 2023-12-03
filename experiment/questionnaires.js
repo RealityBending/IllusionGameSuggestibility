@@ -266,8 +266,7 @@ var pid5_questionnaire = {
     questions: pid_questions,
     randomize_question_order: true,
     preamble:
-        "<p style='overflow-y: scroll;'></p>" +
-        "<p><b>About yourself...</b></p>" +
+        "<h2>About yourself...</h2>" +
         "<p>Below is a list of things different people might say about themselves. Please select the response that best describes you.</p>",
     require_movement: false,
     slider_width: 700,
