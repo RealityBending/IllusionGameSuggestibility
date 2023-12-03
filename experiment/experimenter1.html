@@ -62,12 +62,9 @@
         var timeline = []
 
         var jsPsych = initJsPsych({
-            on_finish: function () {
-                jsPsych.data.addProperties({
-                    experimenter: "Experimenter1",
-                })
-                // jsPsych.data.displayData("json") // Display data in browser
-            },
+            // on_finish: function () {
+            //     jsPsych.data.displayData("json") // Display data in browser
+            // },
         })
 
         // Enter fullscreen mode
@@ -78,7 +75,7 @@
         })
 
         // Demographics ========================================================
-        timeline.push(demographics_consent)
+        timeline.push(demographics_consent((experimenter = "Experimenter1")))
         timeline.push(demographics_browser_info)
         timeline.push(demographics_info)
 
