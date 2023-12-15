@@ -335,4 +335,7 @@ var mist_questionnaire = {
             },
         ],
     ],
+    data: {
+        screen: "questionnaire_mist",
+    },
 }
