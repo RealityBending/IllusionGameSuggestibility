@@ -31,6 +31,23 @@ var demographics_browser_info = {
     },
 }
 
+var restrict_mobile = {
+    timeline: function () {
+        if (jsPsych.data.get().last(1).values()[0]["mobile"] == true) {
+            return [
+                {
+                    type: jsPsychHtmlButtonResponse,
+                    stimulus:
+                        "<p>This experiment is not available on mobile due to screen size restrictions. Please return on tablet or computer.</p> ",
+                    choices: [],
+                },
+            ]
+        } else {
+            return []
+        }
+    },
+}
+
 // Participant ID ========================================================================
 var demographics_participant_id = {
     type: jsPsychSurveyText,
