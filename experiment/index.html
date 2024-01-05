@@ -78,62 +78,62 @@
         // Demographics ========================================================
         timeline.push(demographics_browser_info)
         timeline.push(restrict_mobile)
-        timeline.push(demographics_consent((experimenter = "SONA")))
+        timeline.push(demographics_consent_incentivized)
 
-        timeline.push(demographics_info)
+        // timeline.push(demographics_info)
 
-        // Questionnaires ======================================================
-        var Qs = [
-            ipip6_questionnaire,
-            pid5_questionnaire,
-            sss_questionnaire,
-            mist_questionnaire,
-        ]
-        Qs = jsPsych.randomization.shuffle(Qs) // Randomize order
+        // // Questionnaires ======================================================
+        // var Qs = [
+        //     ipip6_questionnaire,
+        //     pid5_questionnaire,
+        //     sss_questionnaire,
+        //     mist_questionnaire,
+        // ]
+        // Qs = jsPsych.randomization.shuffle(Qs) // Randomize order
 
-        // Start with first questionnaire
-        timeline.push(Qs[0])
-        timeline.push(Qs[1])
+        // // Start with first questionnaire
+        // timeline.push(Qs[0])
+        // timeline.push(Qs[1])
 
-        // Illusion Game =======================================================
+        // // Illusion Game =======================================================
 
-        // Randomize order of the 2 parts
-        var ig_parts = [
-            IG_create_block(stimuli_part1, (show_marker = false)),
-            IG_create_block(stimuli_part2, (show_marker = false)),
-        ]
-        igs = jsPsych.randomization.shuffle(ig_parts)
+        // // Randomize order of the 2 parts
+        // var ig_parts = [
+        //     IG_create_block(stimuli_part1, (show_marker = false)),
+        //     IG_create_block(stimuli_part2, (show_marker = false)),
+        // ]
+        // igs = jsPsych.randomization.shuffle(ig_parts)
 
-        // Add to timeline
-        timeline.push(ig_practice)
-        timeline.push(ig_parts[0])
-        timeline.push(Qs[2])
-        timeline.push(ig_parts[1])
-        timeline.push(Qs[3])
+        // // Add to timeline
+        // timeline.push(ig_practice)
+        // timeline.push(ig_parts[0])
+        // timeline.push(Qs[2])
+        // timeline.push(ig_parts[1])
+        // timeline.push(Qs[3])
 
-        // End =================================================================
-        timeline.push(demographics_waitdatasaving)
+        // // End =================================================================
+        // timeline.push(demographics_waitdatasaving)
 
-        // Save data via DataPipe
-        timeline.push({
-            type: jsPsychPipe,
-            action: "save",
-            experiment_id: "pnAaGIkS01IF", // This in generated in the DataPipe interface
-            filename: `${jsPsych.randomization.randomID(10)}.csv`,
-            data_string: () => jsPsych.data.get().csv(),
-        })
+        // // Save data via DataPipe
+        // timeline.push({
+        //     type: jsPsychPipe,
+        //     action: "save",
+        //     experiment_id: "pnAaGIkS01IF", // This in generated in the DataPipe interface
+        //     filename: `${jsPsych.randomization.randomID(10)}.csv`,
+        //     data_string: () => jsPsych.data.get().csv(),
+        // })
 
-        // Exit fullscreen mode
-        timeline.push({
-            type: jsPsychFullscreen,
-            fullscreen_mode: false,
-        })
+        // // Exit fullscreen mode
+        // timeline.push({
+        //     type: jsPsychFullscreen,
+        //     fullscreen_mode: false,
+        // })
 
-        timeline.push(
-            demographics_endscreen(
-                "https://realitybending.github.io/IllusionGameSuggestibility/experiment"
-            )
-        )
+        // timeline.push(
+        //     demographics_endscreen(
+        //         "https://realitybending.github.io/IllusionGameSuggestibility/experiment"
+        //     )
+        // )
 
         /* ----------------- Run the timeline ----------------- */
         jsPsych.run(timeline)
