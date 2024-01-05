@@ -32,18 +32,19 @@ var demographics_browser_info = {
 }
 
 var restrict_mobile = {
-    timeline: function () {
+    timeline: [
+        {
+            type: jsPsychHtmlButtonResponse,
+            stimulus:
+                "<p><b>This experiment is not available on mobile due to screen size restrictions.</b><br>Please return on tablet or computer.</p> ",
+            choices: [],
+        },
+    ],
+    conditional_function: function () {
         if (jsPsych.data.get().last(1).values()[0]["mobile"] == true) {
-            return [
-                {
-                    type: jsPsychHtmlButtonResponse,
-                    stimulus:
-                        "<p>This experiment is not available on mobile due to screen size restrictions. Please return on tablet or computer.</p> ",
-                    choices: [],
-                },
-            ]
+            return true
         } else {
-            return []
+            return false
         }
     },
 }
