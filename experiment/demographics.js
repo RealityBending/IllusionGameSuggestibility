@@ -6,28 +6,17 @@ var demographics_browser_info = {
         date: new Date().toLocaleDateString("fr-FR"),
         time: new Date().toLocaleTimeString("fr-FR"),
     },
-    on_finish: function () {
-        data = jsPsych.data.get().filter({ screen: "browser_info" }).values()[0]
-        jsPsych.data.addProperties({
-            ["screen_height"]: data["height"],
-            ["screen_width"]: data["width"],
-        })
-        for (var key in data) {
-            if (
-                [
-                    "vsync_rate",
-                    "os",
-                    "mobile",
-                    "browser",
-                    "browser_version",
-                ].includes(key)
-            ) {
-                jsPsych.data.addProperties({
-                    [key]: data[key],
-                })
-            }
-        }
-        jsPsych.data.addProperties()
+    on_finish: function (data) {
+        dat = jsPsych.data.get().filter({ screen: "browser_info" }).values()[0]
+
+        // Rename
+        data["screen_height"] = dat["height"]
+        data["screen_width"] = dat["width"]
+
+        // Add URL variables
+        let urlvars = jsPsych.data.urlVariables()
+        data["sona_id"] = urlvars["sona_id"] // ?sona_id=x
+        data["researcher"] = "experimenter" + urlvars["exp"] // ?exp=1
     },
 }
 
