@@ -157,7 +157,7 @@ var demographics_endscreen = function (
             link +
             "<a/></b></p><br>" +
             "<h2>Information</h2>" +
-            "<p align='left'>The purpose of this study was for us to understand how Humans perceive visual illusions, and whether this relates to personality traits.</p>" +
+            "<p align='left'>The purpose of this study was for us to understand how Humans perceive visual illusions, and whether this relates to personality traits. Hence, this study included the Illusion Game, with measures how people's vision is biased by illusions, as well as various questionnaires that might be related.</p>" +
             "<p align='left'>If you have any questions about the project, please contact D.Makowski@sussex.ac.uk.</p>" +
             "<p><b>You can safely close the tab now.</b></p>",
         choices: ["End"],

@@ -219,7 +219,7 @@ function format_questions_analog(
             prompt: "<b>" + element + "</b>",
             name: dimensions[index],
             ticks: ticks,
-            required: false,
+            required: true,
             min: 0,
             max: 1,
             step: 0.01,
@@ -256,7 +256,7 @@ for (const [index, element] of pid_items.entries()) {
             "Sometimes or Somewhat True",
             "Very or Often True",
         ],
-        required: false,
+        required: true,
     })
 }
 
@@ -288,7 +288,7 @@ for (const [index, element] of sss_items.entries()) {
             "Quite a bit",
             "A lot",
         ],
-        required: false,
+        required: true,
     })
 }
 
