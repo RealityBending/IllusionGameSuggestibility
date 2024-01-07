@@ -2,7 +2,7 @@
 
 **Project Description**
 
-This online study includes a reaction-time perceptual decision-making task (the "Illusion Game"), accompanied by personality questionnaires. 
+This online study includes a perceptual decision-making task (the "Illusion Game"), accompanied by personality questionnaires. 
 The goal is to 1) validate the Illusion Game as a reliable measure of illusion sensitivity and 2) investigate the correlates with other dispositional measures. 
 The study's duration is approximately 30min, and it contains the following elements:
 
