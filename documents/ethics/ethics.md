@@ -18,10 +18,10 @@ Participants will then undergo a brief demographic survey, to collect voluntary 
 
 - Questionnaires
 
-The IPIP-6 (Sibley et al., 2011) measures 6 "normal" personality traits (Extraversion, Openness, Conscientiousness, Agreeableness, Neuroticism and Honesty-Humility) with 24-items on analog scales.
-The PID-5 (Krueger et al., 2011) measures 5 "pathological" (i.e., maladaptive) personality traits (Disinhibition, Antagonism, Detachment, Negative Affect and Psychoticism) with 25-items on Likert scales.
-The SSS-21 (Kotov et al., 2004) is a condensed version of the multidimensional Iowa suggestibility scale and measures participants' sensibility and adaptability with 21-items on Likert scales.
-The MIST-20 (Maertens et al 2020) measures participants ability to discriminate between real and fake news with 20 dichotomous items.
+1) The IPIP-6 (Sibley et al., 2011) measures 6 "normal" personality traits (Extraversion, Openness, Conscientiousness, Agreeableness, Neuroticism and Honesty-Humility) with 24-items on analog scales.
+2) The PID-5 (Krueger et al., 2011) measures 5 "pathological" (i.e., maladaptive) personality traits (Disinhibition, Antagonism, Detachment, Negative Affect and Psychoticism) with 25-items on Likert scales.
+3) The SSS-21 (Kotov et al., 2004) is a condensed version of the multidimensional Iowa suggestibility scale and measures participants' sensibility and adaptability with 21-items on Likert scales.
+4) The MIST-20 (Maertens et al 2020) measures participants ability to discriminate between real and fake news with 20 dichotomous items.
 
 - Illusion Game
 
