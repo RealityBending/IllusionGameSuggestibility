@@ -54,9 +54,7 @@ var demographics_participant_id = {
     on_finish: function () {
         // Store `participant_id` so that it can be reused later
         jsPsych.data.addProperties({
-            participant_id: jsPsych.data.get().last().values()[0]["response"][
-                "Participant_ID"
-            ],
+            participant_id: jsPsych.data.get().last().values()[0]["response"]["Participant_ID"],
         })
     },
 }

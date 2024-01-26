@@ -37,8 +37,8 @@ The tasks order is as follows: 2 questionnaires, followed by the first block of 
 
 - Participants
 
-Participants will be recruited via convenience sampling, or via other recruitment systems if available (e.g., SONA, Prolific). 
-The incentive type and amount (of lack thereof) will be recorded to test and mitigate for its potential effect.
+Participants will be recruited via convenience sampling (e.g., via social media), or via other recruitment platforms if available (e.g., SONA, Prolific). 
+The samples from different methods of recruitment will be collected separately in case they are different (the incentive type - e.g., student credits - and amount - or lack thereof - will thus be known to mitigate its potential effect).
 As we aim at recruiting a diverse sample, there are no exclusion criteria beside having to do the experiment on a computer/laptop (as it is not mobile friendly).
 
 - Risks

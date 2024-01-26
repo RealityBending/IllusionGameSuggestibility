@@ -1,5 +1,5 @@
 // Items =================================================
-// Mini IPIP6 questionnaire
+// Mini-IPIP6 questionnaire (Sibley, 2011)
 var ipip6_items = [
     "I am the life of the party",
     "I sympathise with others' feelings",
@@ -208,11 +208,7 @@ let mist_dimensions = [
 // Questionnaires =================================================
 
 // Format IPIP6 items ------------------------------------------------
-function format_questions_analog(
-    items,
-    dimensions,
-    ticks = ["Inaccurate", "Accurate"]
-) {
+function format_questions_analog(items, dimensions, ticks = ["Inaccurate", "Accurate"]) {
     var questions = []
     for (const [index, element] of items.entries()) {
         questions.push({
@@ -281,13 +277,7 @@ for (const [index, element] of sss_items.entries()) {
     sss_questions.push({
         prompt: "<b>" + element + "</b>",
         name: sss_dimensions[index],
-        labels: [
-            "Not at all or very slightly",
-            "A little",
-            "Somewhat",
-            "Quite a bit",
-            "A lot",
-        ],
+        labels: ["Not at all or very slightly", "A little", "Somewhat", "Quite a bit", "A lot"],
         required: true,
     })
 }

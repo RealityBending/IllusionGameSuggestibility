@@ -1,8 +1,8 @@
 **2 credits** | 30min online study | Can you resist visual illusions?
 
-This study aims at validating a reaction time task based on visual illusions
+This study aims at validating a reaction time game based on visual illusions.
 
-In this study, you will be required to complete various questionnaires about yourself, as well as play the Illusion Game. In this task, the role is to make decisions by pressing a key as fast as possible without being distracted by illusions. 
+In this study, you will be required to complete various questionnaires about yourself, as well as play the Illusion Game, a speed game where you have to answer as fast as possible visual challenges (e.g., which red circle is bigger) while trying to not be biased by the illusions.
 
 Computer/laptop
 
@@ -11,3 +11,7 @@ Computer/laptop
 2
 
 Please find a quiet space and time to complete the study in one go (30min)
+
+ER/HER27/1
+
+https://realitybending.github.io/IllusionGameSuggestibility/experiment/index?exp=sona&sona_id=%SURVEY_CODE%
