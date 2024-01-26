@@ -47,6 +47,58 @@ Total number of observations: `r nrow(df)`.
 
 ```{r}
 # MIST
+desired_col_order <- c(
+    "MIST_Real_A_1",
+    "MIST_Real_A_2",
+    "MIST_Real_A_3",
+    "MIST_Real_A_4",
+    "MIST_Real_A_5",
+    "MIST_Real_B_6",
+    "MIST_Real_B_7",
+    "MIST_Real_B_8",
+    "MIST_Fake_C_9",
+    "MIST_Fake_C_10",
+    "MIST_Fake_C_11",
+    "MIST_Fake_C_12",
+    "MIST_Fake_C_13",
+    "MIST_Fake_D_14",
+    "MIST_Fake_D_15",
+    "MIST_Fake_D_16")    
+dfsub <- dfsub %>%
+  relocate(desired_col_order, .after = last_col())
+
+#real <- dfsub[,88:95]
+#fake <- dfsub[,86:103]
+
+for (col_name in colnames(dfsub[, 88:95])) {
+  new_col_name <- paste("correct", col_name, sep = "_")
+  dfsub[, new_col_name] <- dfsub[, col_name]
+}
+
+for (col_name in colnames(dfsub[, 96:103])) {
+  new_col_name <- paste("correct", col_name, sep = "_")
+  dfsub[, new_col_name] <- 1 - dfsub[, col_name]
+}
+
+dfsub$Veracity_Discernment <- rowSums(dfsub[, 104:119]) 
+
+dfsub$Real_News_Detection <- rowSums(dfsub[, 104:111]) 
+
+dfsub$Fake_News_Detection <- rowSums(dfsub[, 112:119]) 
+
+
+reversed_for_distrust <- dfsub[, 88:103]
+for (x in colnames(reversed_for_distrust)) {
+  reversed_for_distrust[, x] <- 1 - reversed_for_distrust[, x]
+}
+
+dfsub$Distrust <- rowSums(reversed_for_distrust) - 8
+dfsub$Distrust <- ifelse(dfsub$Distrust < 0, 0, dfsub$Distrust)
+  
+dfsub$Naïvité <- rowSums(dfsub[, 88:103]) - 8
+dfsub$Naïvité <- ifelse(dfsub$Naïvité < 0, 0, dfsub$Naïvité)
+
+
 ```
 
 ### Recruitment History
