@@ -38,67 +38,76 @@ df <- read.csv("../data/rawdata_IllusionGame.csv") |>
   ungroup()
 ```
 
-The initial sample consisted of `r report::report_participants(dfsub, age="Age", gender="Gender", education="Education")`.
-
-
-Total number of observations: `r nrow(df)`.
+The initial sample consisted of `r report::report_participants(dfsub, age="Age", gender="Gender", education="Education")`, for a total trial number of `r nrow(df)`.
 
 ### Score Computation
 
+#### IPIP6
+
 ```{r}
-# MIST
-desired_col_order <- c(
-    "MIST_Real_A_1",
-    "MIST_Real_A_2",
-    "MIST_Real_A_3",
-    "MIST_Real_A_4",
-    "MIST_Real_A_5",
-    "MIST_Real_B_6",
-    "MIST_Real_B_7",
-    "MIST_Real_B_8",
-    "MIST_Fake_C_9",
-    "MIST_Fake_C_10",
-    "MIST_Fake_C_11",
-    "MIST_Fake_C_12",
-    "MIST_Fake_C_13",
-    "MIST_Fake_D_14",
-    "MIST_Fake_D_15",
-    "MIST_Fake_D_16")    
-dfsub <- dfsub %>%
-  relocate(desired_col_order, .after = last_col())
-
-#real <- dfsub[,88:95]
-#fake <- dfsub[,86:103]
-
-for (col_name in colnames(dfsub[, 88:95])) {
-  new_col_name <- paste("correct", col_name, sep = "_")
-  dfsub[, new_col_name] <- dfsub[, col_name]
+SD_per_dim <- function(x, dims="") {
+  m <- matrix(nrow=nrow(x), ncol=0)
+  for(s in dims) {
+    m <- cbind(m, sapply(as.data.frame(t(x[grepl(s, names(x))])), sd))
+  }
+  m
 }
 
-for (col_name in colnames(dfsub[, 96:103])) {
-  new_col_name <- paste("correct", col_name, sep = "_")
-  dfsub[, new_col_name] <- 1 - dfsub[, col_name]
-}
+ipip6 <- select(dfsub, starts_with("IPIP6_"), -IPIP6_Duration, -IPIP6_Order)
+ipip6[grepl("_R", names(ipip6))] <- 1 - ipip6[grepl("_R", names(ipip6))]
 
-dfsub$Veracity_Discernment <- rowSums(dfsub[, 104:119]) 
+dfsub$IPIP6_Extraversion <- rowMeans(ipip6[grepl("Extraversion", names(ipip6))])
+dfsub$IPIP6_Conscientiousness <- rowMeans(ipip6[grepl("Conscientiousness", names(ipip6))])
+dfsub$IPIP6_Neuroticism <- rowMeans(ipip6[grepl("Neuroticism", names(ipip6))])
+dfsub$IPIP6_Openness <- rowMeans(ipip6[grepl("Openness", names(ipip6))])
+dfsub$IPIP6_HonestyHumility <- rowMeans(ipip6[grepl("HonestyHumility", names(ipip6))])
+dfsub$IPIP6_Agreeableness <- rowMeans(ipip6[grepl("Agreeableness", names(ipip6))])
+dfsub$IPIP6_SD <- rowMeans(SD_per_dim(ipip6, c("Extraversion", "Conscientiousness", "Neuroticism",
+                                               "Openness", "HonestyHumility", "Agreeableness")))
+```
 
-dfsub$Real_News_Detection <- rowSums(dfsub[, 104:111]) 
+#### PID-5
 
-dfsub$Fake_News_Detection <- rowSums(dfsub[, 112:119]) 
+```{r}
+pid5 <- select(dfsub, starts_with("PID5_"), -PID5_Duration, -PID5_Order)
 
+dfsub$PID5_Disinhibition <- rowMeans(pid5[grepl("Disinhibition", names(pid5))])
+dfsub$PID5_Detachment <- rowMeans(pid5[grepl("Detachment", names(pid5))])
+dfsub$PID5_NegativeAffect <- rowMeans(pid5[grepl("NegativeAffect", names(pid5))])
+dfsub$PID5_Antagonism <- rowMeans(pid5[grepl("Antagonism", names(pid5))])
+dfsub$PID5_Psychoticism <- rowMeans(pid5[grepl("Psychoticism", names(pid5))])
+dfsub$PID5_SD <- rowMeans(SD_per_dim(pid5, c("Disinhibition", "Detachment", "NegativeAffect",
+                                             "Antagonism", "Psychoticism")))
+```
 
-reversed_for_distrust <- dfsub[, 88:103]
-for (x in colnames(reversed_for_distrust)) {
-  reversed_for_distrust[, x] <- 1 - reversed_for_distrust[, x]
-}
+#### SSS
 
-dfsub$Distrust <- rowSums(reversed_for_distrust) - 8
-dfsub$Distrust <- ifelse(dfsub$Distrust < 0, 0, dfsub$Distrust)
-  
-dfsub$Naïvité <- rowSums(dfsub[, 88:103]) - 8
-dfsub$Naïvité <- ifelse(dfsub$Naïvité < 0, 0, dfsub$Naïvité)
+```{r}
+#| eval: false
+sss <- select(dfsub, starts_with("SSS_"), -SSS_Duration, -SSS_Order)
 
+dfsub$SSS_General <- rowMeans(sss / 4)
+```
 
+#### MIST-16
+
+From Maertens et al. (2023): *"We recommend to calculate and report all five scores of the Verification done framework"*:
+
+  - V (Veracity Discernment): V can be calculated by scoring each of the responses on a binary 0 (incorrect) or 1 (correct) metric and taking the sum of the score.
+  - r (Real News Detection): The sum of all scores for the real news items results in the r score.
+  - f (Fake News Detection): The sum of all scores for the fake news items results in the f score.
+  - d (Distrust): To calculate d, all responses must be scored on a binary 0 (not fake news) or 1 (fake news) metric, independent of whether the response is correct or incorrect. The sum of this amount of fake news judgements should then be subtracted by 10 (MIST-20), 8 (MIST-16), or 4 (MIST-8), and this results in the distrust score. If the resulting score is below 0, the score should be corrected to 0.
+  - n (Naïvité): To calculate n, all responses must be scored on a binary 0 (not real news) or 1 (real news), independent of whether the response is correct or incorrect. The sum of this amount of real news judgements should then be subtracted by 10 (MIST-20), 8 (MIST-16), or 4 (MIST-8), and this results in the naïvité score. If the resulting score is below 0, the score should be corrected to 0.
+
+```{r}
+#| eval: false
+mist <- select(dfsub, starts_with("MIST_"), -MIST_Duration, -MIST_Order)
+
+dfsub$MIST_RealDetection <- rowSums(mist[grepl("Real", names(mist))])
+dfsub$MIST_FakeDetection <- rowSums(mist[grepl("Fake", names(mist))] == 0)
+dfsub$MIST_Discernment <- dfsub$MIST_RealDetection + dfsub$MIST_FakeDetection
+dfsub$MIST_Distrust <- rowSums(mist == 0) - 8
+dfsub$MIST_Naivete <- rowSums(mist) - 8
 ```
 
 ### Recruitment History
@@ -161,11 +170,10 @@ outliers <- c()
 
 
 
-### Reaction Time (Blocks)
+### Reaction Time (per Block) {.tabset}
 
 ```{r}
-#| fig-width: 15
-#| fig-height: 15
+#| message: false
 
 errorrate <- df |>
   group_by(Participant, Illusion_Type, Block) |>
@@ -177,6 +185,7 @@ plot_distribution <- function(df) {
   d_all <- estimate_density(df, select = "RT")
   
   data_error <- errorrate |>
+    filter(Participant %in% unique(df$Participant)) |>
     group_by(Participant, Block) |>
     summarize(y = mean(ErrorRate_per_block), .groups="drop") |>
     mutate(x = ifelse(Block == "A", 2.1, 2.3),
@@ -215,15 +224,35 @@ plot_distribution <- function(df) {
     facet_wrap(~Participant) +
     labs(y = "", x = "Reaction Time (s)")
 }
-
-plot_distribution(df)
 ```
 
-### Error Rate (Blocks)
+::: {.panel-tabset}
+
+#### 1-10
+
+```{r}
+#| fig-width: 15
+#| fig-height: 20
+
+plot_distribution(df[df$Participant %in% dfsub$Participant[1:10], ])
+```
+
+#### 10-20
+
+```{r}
+#| fig-width: 15
+#| fig-height: 20
+
+plot_distribution(df[df$Participant %in% dfsub$Participant[10:15], ])
+```
+
+:::
+
+### Error Rate (per Block)
 
 For each block, we computed the error rate and, if more than 50%, we discarded the whole block (as it likely indicates that instructions got mixed up, for instance participants were selecting the smaller instead of the bigger circle).
 
-```{r p_outliers_errorblock, message=FALSE, warning=FALSE}
+```{r p_outliers_errorblock}
 errorrate |>
   estimate_density(at = c("Illusion_Type", "Block"), method = "KernSmooth") |>
   ggplot(aes(x = x, y = y)) +
@@ -257,6 +286,104 @@ remove_badblocks <- function(df) {
 out <- remove_badblocks(df)
 print(paste("Illusion (session 1):", out$text))
 df <- out$data
+```
+
+### Reaction Time (per Tlock)
+
+```{r outliers_RTtrials}
+check_trials <- function(df) {
+  data <- df |>
+    mutate(Outlier = ifelse(RT >= 10, TRUE, FALSE)) |>
+    group_by(Participant) |>
+    mutate(Outlier = ifelse(RT < 0.150 | standardize(RT, robust = TRUE) > 4, TRUE, Outlier)) |>
+    ungroup()
+
+  p1 <- data |>
+    filter(RT < 10) |>
+    estimate_density(select = "RT", at = "Participant") |>
+    group_by(Participant) |>
+    normalize(select = "y") |>
+    ungroup() |>
+    merge(data |>
+      group_by(Participant) |>
+      mutate(Threshold = median(RT) + 4 * mad(RT)) |>
+      filter(Error == 0) |>
+      summarize(Threshold = mean(Threshold))) |>
+    mutate(Outlier = ifelse(x >= Threshold, TRUE, FALSE)) |>
+    ggplot(aes(x = x, y = y)) +
+    geom_area(data = normalize(estimate_density(filter(data, RT < 10), select = "RT"), select = "y"), alpha = 0.2) +
+    geom_line(aes(color = Participant, linetype = Outlier), alpha = 0.2) +
+    geom_vline(xintercept = c(125), linetype = "dashed", color = "red") +
+    scale_color_material_d("rainbow", guide = "none") +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    guides(linetype = "none") +
+    coord_cartesian(xlim = c(0, 5)) +
+    theme_modern() +
+    theme(axis.text.y = element_blank()) +
+    labs(y = "", x = "Reaction Time (s)")
+
+
+  p2 <- data |>
+    group_by(Participant) |>
+    summarize(Outlier = sum(Outlier) / n()) |>
+    mutate(Participant = fct_reorder(Participant, Outlier)) |>
+    ggplot(aes(x = Participant, y = Outlier)) +
+    geom_bar(stat = "identity", aes(fill = Participant)) +
+    scale_fill_material_d("rainbow", guide = "none") +
+    scale_x_discrete(expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0), labels = scales::percent) +
+    see::theme_modern() +
+    # theme(axis.text.x = element_blank()) +
+    labs(y = "Percentage of outlier trials")
+
+  text <- paste0(
+    "We removed ",
+    sum(data$Outlier),
+    " (",
+    insight::format_value(sum(data$Outlier) / nrow(data), as_percent = TRUE),
+    ") outlier trials (150 ms < RT < 4 MAD above median)."
+  )
+
+  data <- filter(data, Outlier == FALSE)
+  data$Outlier <- NULL
+
+  list(p = p1 / p2, data = data, text = text)
+}
+```
+
+```{r p_outliers_RTtrials}
+#| results: 'asis'
+
+out <- check_trials(df)
+out$text
+out$p
+df <- out$data
+```
+
+### Questionnaires
+
+
+```{r}
+outliers <- dfsub |> 
+  select(IPIP6_SD, IPIP6_Duration, PID5_SD, PID5_Duration) |> 
+  standardize() |> 
+  performance::check_outliers(method = c("mahalanobis"))
+                              
+table <- dfsub |> 
+  select(Participant, IPIP6_SD, IPIP6_Duration, PID5_SD, PID5_Duration) |> 
+  mutate(Participant = fct_reorder(Participant, desc(attributes(outliers)$data$Distance_Mahalanobis))) |> 
+  arrange(Participant)
+
+data.frame(Participant = c("Average"), t(sapply(table[2:ncol(table)], mean, na.rm = TRUE))) |>
+  rbind(table) |> 
+  gt::gt() |> 
+  gt::data_color(columns = ends_with("Duration"), 
+                 direction="column", palette = "viridis", reverse=TRUE) |> 
+  gt::data_color(columns = ends_with("SD"), 
+                 direction="column", palette = "viridis") |> 
+  gt::data_color(direction="row", rows=1, palette = "grey") |> 
+  gt::opt_interactive(use_compact_mode = TRUE)
 ```
 
 
@@ -346,14 +473,7 @@ p_edu
 
 ### Summary
 
-The final sample includes `r report::report_participants(df, age="Age", sex="Sex", education="Education")`.
-
-```{r p_summary}
-#| fig-width: 15
-#| fig-height: 15
-
-p_age + p_edu
-```
+The final sample includes `r report::report_participants(dfsub, age="Age", sex="Sex", education="Education")`.
 
 ## Save 
 
