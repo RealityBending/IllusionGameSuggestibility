@@ -56,15 +56,14 @@
         var timeline = []
 
         var jsPsych = initJsPsych({
-            on_finish: function () {
-                // jsPsych.data.displayData("json") // Display data in browser
-
-                let sona_id = jsPsych.data.urlVariables()["sona_id"]
-                window.location.assign(
-                    "https://sussexpsychology.sona-systems.com/webstudy_credit.aspx?experiment_id=1826&credit_token=5b2dc72c7ea14bed87ef4eac2bdac408&survey_code=" +
-                        sona_id
-                )
-            },
+            // on_finish: function () {
+            //     // jsPsych.data.displayData("json") // Display data in browser
+            //     let sona_id = jsPsych.data.urlVariables()["sona_id"]
+            //     window.location.assign(
+            //         "https://sussexpsychology.sona-systems.com/webstudy_credit.aspx?experiment_id=1826&credit_token=5b2dc72c7ea14bed87ef4eac2bdac408&survey_code=" +
+            //             sona_id
+            //     )
+            // },
         })
 
         // Enter fullscreen mode
