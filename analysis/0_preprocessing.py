@@ -2,6 +2,7 @@ import json
 
 import pandas as pd
 import numpy as np
+import seaborn as sns
 
 
 # Get files from OSF ======================================================
@@ -22,6 +23,8 @@ def osf_listfiles(data_subproject="", token="", after_date=None):
         }
         for file in storage.files
     ]
+    file = [f for f in storage.files][0]
+    file.__dict__
 
     if after_date is not None:
         date = pd.to_datetime(after_date, format="%d/%m/%Y", utc=True)
@@ -29,7 +32,7 @@ def osf_listfiles(data_subproject="", token="", after_date=None):
     return files
 
 
-token = ""  # Paste OSF token here to access private repositories
+token = "zYboMoukFI8HKabenQ35DH6tESHJo6oZll5BvOPma6Dppjqc2jnIB6sPCERCuaqO0UrHAa"  # Paste OSF token here to access private repositories
 files = osf_listfiles(
     token=token,
     data_subproject="6xdz9",  # Data subproject ID
@@ -40,6 +43,7 @@ files = osf_listfiles(
 # Loop through files ======================================================
 alldata_sub = pd.DataFrame()  # Initialize empty dataframe
 alldata_ig = pd.DataFrame()  # Initialize empty dataframe
+sona_ids = {}
 
 for i, file in enumerate(files):
     print(f"File N°{i+1}/{len(files)}")
@@ -50,13 +54,13 @@ for i, file in enumerate(files):
     # data["screen"].unique()
 
     # Browser info -------------------------------------------------------
-    brower = data[data["screen"] == "browser_info"].iloc[0]
+    browser = data[data["screen"] == "browser_info"].iloc[0]
 
     # Experimenter
-    if "experimenter" in brower.index:
+    if "experimenter" in browser.index:
         experimenter = "Experimenter1"
     else:
-        experimenter = brower["researcher"]
+        experimenter = browser["researcher"]
     if isinstance(experimenter, float):
         experimenter = "Experimenter" + str(int(experimenter))
 
@@ -66,16 +70,75 @@ for i, file in enumerate(files):
             "Experimenter": experimenter,
             "Experiment_Duration": data["time_elapsed"].max() / 1000 / 60,
             "Date_OSF": file["date"],
-            "Date": brower["date"],
-            "Time": brower["time"],
-            "Browser": brower["browser"],
-            "Mobile": brower["mobile"],
-            "Platform": brower["os"],
-            "Screen_Width": brower["screen_width"],
-            "Screen_Height": brower["screen_height"],
+            "Date": browser["date"],
+            "Time": browser["time"],
+            "Browser": browser["browser"],
+            "Mobile": browser["mobile"],
+            "Platform": browser["os"],
+            "Screen_Width": browser["screen_width"],
+            "Screen_Height": browser["screen_height"],
         },
         index=[0],
     )
+
+    if "sona_id" in browser.index:
+        if np.isnan(browser["sona_id"]) == False:
+            id = int(browser["sona_id"])
+            df["SONA_ID"] = id
+            if id not in [
+                27027,
+                28388,
+                29913,
+                30623,
+                30633,
+                30645,
+                30644,
+                30675,
+                30694,
+                30695,
+                30722,
+                30725,
+                30760,
+                30768,
+                30772,
+                30809,
+                30839,
+                30827,
+                # 30854,
+                30862,
+                30872,
+                30876,
+                30885,
+                30889,
+                30901,
+                30993,
+                31037,
+                31060,
+                31065,
+                31728,
+                31731,
+                31777,
+                31783,
+                31810,
+                31822,
+                31852,  # Awarded 0
+                31857,
+                31864,
+                31869,
+                31827,
+                31852,
+                31853,
+                31885,
+                31923,
+                31935,
+                31978,
+                32068,
+                32085,
+                32148,
+                32161,
+                32165,
+            ]:
+                sona_ids[file["name"]] = id
 
     # Demographics -------------------------------------------------------
     demo1 = data[data["screen"] == "demographics_1"].iloc[0]
@@ -99,18 +162,23 @@ for i, file in enumerate(files):
 
     # Ethnicity
     race = demo2["ethnicity"].title().rstrip()
-    race = "Caucasian" if race in ["British", "White British"] else race
+    race = (
+        "Caucasian"
+        if race in ["British", "White British", "Czech", "European", "Nederlander"]
+        else race
+    )
     race = "Mixed" if race in ["Caucasion Metis"] else race
     race = "South Asian" if race in ["Indian"] else race
+    race = np.nan if race in [""] else race
     df["Ethnicity"] = race
 
     # Questionnaires =====================================================
 
     # Manual fix (2 first participants had duplicated questionnaires)
     if file["name"] in ["8va2haolh5", "exgf9of50l"]:
-        data.loc[
-            data["screen"][data["trial_type"] == "survey"].index, "screen"
-        ] = "questionnaire_mist"
+        data.loc[data["screen"][data["trial_type"] == "survey"].index, "screen"] = (
+            "questionnaire_mist"
+        )
         if file["name"] == "exgf9of50l":
             data = data.drop(data[data["screen"] == "questionnaire_mist"].index[1])
             data = data.drop(data[data["screen"] == "questionnaire_ipip6"].index[1])
@@ -197,21 +265,34 @@ for i, file in enumerate(files):
 
 # Save data ==============================================================
 
+# SONA check =============================================================
+if len(sona_ids) > 0:
+    # np.sort([int(k[1]) for k in sona_ids.items()])
+    d = alldata_ig[
+        [i in list(sona_ids.keys()) for i in alldata_ig["Participant"].values]
+    ]
+    d.loc[:, "Participant"] = [str(sona_ids[i]) for i in d["Participant"].values]
+    # d = d[[x in ["31852"] for x in d.Participant]]
+    sns.kdeplot(data=d[d.Block == "A"], x="RT", hue="Participant", bw_adjust=0.5).set(
+        xlim=(0, 3)
+    )
+    sns.kdeplot(
+        data=d[d.Block == "B"], x="RT", hue="Participant", bw_adjust=0.5, linestyle="--"
+    ).set(xlim=(0, 3))
+# sona = np.sort(alldata_sub["SONA_ID"].unique())
+# sona = sona[~np.isnan(sona)].astype(int)
+# 30868 in sona
+
+
 # Remove columns
 alldata_sub = alldata_sub.drop(
-    columns=[
-        "Time",
-        "Browser",
-        "Platform",
-        "Screen_Width",
-        "Screen_Height",
-    ]
+    columns=["Time", "Browser", "Platform", "Screen_Width", "Screen_Height", "SONA_ID"]
 )
 # Inspect ================================================================
 # alldata_sub["Experimenter"].unique()
 # alldata_sub["Ethnicity"].unique()
 
-# Reanonimize
+# Reanonimize ============================================================
 alldata_sub = alldata_sub.sort_values(by=["Date_OSF"]).reset_index(drop=True)
 correspondance = {j: f"S{i+1:03}" for i, j in enumerate(alldata_sub["Participant"])}
 alldata_sub["Participant"] = [correspondance[i] for i in alldata_sub["Participant"]]

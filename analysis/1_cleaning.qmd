@@ -52,6 +52,9 @@ SD_per_dim <- function(x, dims="") {
   }
   m
 }
+```
+```{r}
+#| code-fold: false
 
 ipip6 <- select(dfsub, starts_with("IPIP6_"), -IPIP6_Duration, -IPIP6_Order)
 ipip6[grepl("_R", names(ipip6))] <- 1 - ipip6[grepl("_R", names(ipip6))]
@@ -69,6 +72,8 @@ dfsub$IPIP6_SD <- rowMeans(SD_per_dim(ipip6, c("Extraversion", "Conscientiousnes
 #### PID-5
 
 ```{r}
+#| code-fold: false
+
 pid5 <- select(dfsub, starts_with("PID5_"), -PID5_Duration, -PID5_Order)
 
 dfsub$PID5_Disinhibition <- rowMeans(pid5[grepl("Disinhibition", names(pid5))])
@@ -83,10 +88,13 @@ dfsub$PID5_SD <- rowMeans(SD_per_dim(pid5, c("Disinhibition", "Detachment", "Neg
 #### SSS
 
 ```{r}
-#| eval: false
+#| code-fold: false
+
 sss <- select(dfsub, starts_with("SSS_"), -SSS_Duration, -SSS_Order)
 
 dfsub$SSS_General <- rowMeans(sss / 4)
+
+dfsub$SSS_SD <- rowMeans(SD_per_dim(sss, c("SSS")))
 ```
 
 #### MIST-16
@@ -100,7 +108,8 @@ From Maertens et al. (2023): *"We recommend to calculate and report all five sco
   - n (Naïvité): To calculate n, all responses must be scored on a binary 0 (not real news) or 1 (real news), independent of whether the response is correct or incorrect. The sum of this amount of real news judgements should then be subtracted by 10 (MIST-20), 8 (MIST-16), or 4 (MIST-8), and this results in the naïvité score. If the resulting score is below 0, the score should be corrected to 0.
 
 ```{r}
-#| eval: false
+#| code-fold: false
+
 mist <- select(dfsub, starts_with("MIST_"), -MIST_Duration, -MIST_Order)
 
 dfsub$MIST_RealDetection <- rowSums(mist[grepl("Real", names(mist))])
@@ -154,18 +163,20 @@ dfsub |>
   labs(
     title = "Experiment Completion Time",
     x = "Duration (in minutes)",
-    y = "Participant"
+    y = "Participants"
   )  +
   see::theme_modern() +
   ggside::theme_ggside_void() +
-  theme(ggside.panel.scale = .3) 
+  theme(ggside.panel.scale = .3, 
+        axis.text.y = element_blank()) 
 ```
 
 
 ## Exclusion
 
 ```{r}
-outliers <- c()
+outliers <- c("S044")
+outliers_half <- c("S031", "S036", "S051")
 ```
 
 
@@ -191,6 +202,7 @@ plot_distribution <- function(df) {
     mutate(x = ifelse(Block == "A", 2.1, 2.3),
            color = case_when(
               Participant %in% outliers ~ "red",
+              Participant %in% outliers_half ~ "orange",
               TRUE ~ "blue"
             ))
   
@@ -203,6 +215,7 @@ plot_distribution <- function(df) {
       Participant = fct_relevel(Participant, sort(unique(df$Participant))),
       color = case_when(
         Participant %in% outliers ~ "red",
+        Participant %in% outliers_half ~ "orange",
         TRUE ~ "blue"
       )
     ) |>
@@ -228,25 +241,34 @@ plot_distribution <- function(df) {
 
 ::: {.panel-tabset}
 
-#### 1-10
+#### 1-40
 
 ```{r}
 #| fig-width: 15
 #| fig-height: 20
 
-plot_distribution(df[df$Participant %in% dfsub$Participant[1:10], ])
+plot_distribution(df[df$Participant %in% dfsub$Participant[1:40], ])
 ```
 
-#### 10-20
+#### 40-80
 
 ```{r}
 #| fig-width: 15
 #| fig-height: 20
 
-plot_distribution(df[df$Participant %in% dfsub$Participant[10:15], ])
+plot_distribution(df[df$Participant %in% dfsub$Participant[41:80], ])
 ```
+
 
 :::
+
+We discarded `r length(outliers_half)` participant's second blocks.
+
+```{r}
+df <- df |> 
+  filter(!((Block == "B") & (Participant %in% outliers_half)))
+```
+
 
 ### Error Rate (per Block)
 
@@ -258,7 +280,7 @@ errorrate |>
   ggplot(aes(x = x, y = y)) +
   geom_line(aes(color = Illusion_Type, linetype = Block)) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
-  scale_x_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0), labels = scales::percent) +
   scale_y_continuous(expand = c(0, 0)) +
   scale_color_manual(values = c("Ebbinghaus" = "#2196F3", "MullerLyer" = "#4CAF50", "VerticalHorizontal" = "#FF5722")) +
   labs(y = "Distribution", x = "Error Rate") +
@@ -334,7 +356,7 @@ check_trials <- function(df) {
     scale_x_discrete(expand = c(0, 0)) +
     scale_y_continuous(expand = c(0, 0), labels = scales::percent) +
     see::theme_modern() +
-    # theme(axis.text.x = element_blank()) +
+    theme(axis.text.x = element_blank()) +
     labs(y = "Percentage of outlier trials")
 
   text <- paste0(
@@ -366,26 +388,27 @@ df <- out$data
 
 ```{r}
 outliers <- dfsub |> 
-  select(IPIP6_SD, IPIP6_Duration, PID5_SD, PID5_Duration) |> 
-  standardize() |> 
-  performance::check_outliers(method = c("mahalanobis"))
+  select(IPIP6_SD, IPIP6_Duration, PID5_SD, PID5_Duration, SSS_SD, SSS_Duration) |> 
+  standardize(robust=TRUE) |> 
+  mutate(SD = rowSums(across(ends_with("SD"))), Duration = rowSums(across(ends_with("Duration")))) 
                               
 table <- dfsub |> 
-  select(Participant, IPIP6_SD, IPIP6_Duration, PID5_SD, PID5_Duration) |> 
-  mutate(Participant = fct_reorder(Participant, desc(attributes(outliers)$data$Distance_Mahalanobis))) |> 
+  select(Participant, IPIP6_SD, IPIP6_Duration, PID5_SD, PID5_Duration, SSS_SD, SSS_Duration) |> 
+  mutate_at(vars(ends_with("Duration")), \(x) ifelse(x > 10, 10, x)) |>
+  mutate(Participant = fct_reorder(Participant, desc(outliers$SD))) |> 
   arrange(Participant)
 
 data.frame(Participant = c("Average"), t(sapply(table[2:ncol(table)], mean, na.rm = TRUE))) |>
   rbind(table) |> 
   gt::gt() |> 
+  gt::data_color(columns = "Participant", fn=\(x) ifelse(x %in% outliers_half, "orange", "white")) |>
   gt::data_color(columns = ends_with("Duration"), 
-                 direction="column", palette = "viridis", reverse=TRUE) |> 
+                 direction="column", palette = "RdBu") |> 
   gt::data_color(columns = ends_with("SD"), 
-                 direction="column", palette = "viridis") |> 
+                 direction="column", palette = "RdBu", reverse=TRUE) |> 
   gt::data_color(direction="row", rows=1, palette = "grey") |> 
   gt::opt_interactive(use_compact_mode = TRUE)
 ```
-
 
 
 
