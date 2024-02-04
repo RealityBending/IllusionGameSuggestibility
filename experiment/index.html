@@ -11,10 +11,7 @@
         <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice"></script>
         <script src="https://unpkg.com/@jspsych/plugin-html-button-response"></script>
         <script src="https://unpkg.com/@jspsych/plugin-survey"></script>
-        <link
-            rel="stylesheet"
-            href="https://unpkg.com/@jspsych/plugin-survey/css/survey.css"
-        />
+        <link rel="stylesheet" href="https://unpkg.com/@jspsych/plugin-survey/css/survey.css" />
         <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.3"></script>
 
         <!-- Load plugins used in Questionnaires -->
@@ -38,11 +35,7 @@
         <script src="https://realitybending.github.io/IllusionGame/v3/instructions.js"></script>
         <script src="https://realitybending.github.io/IllusionGame/v3/IllusionGame.js"></script>
 
-        <link
-            href="https://unpkg.com/jspsych/css/jspsych.css"
-            rel="stylesheet"
-            type="text/css"
-        />
+        <link href="https://unpkg.com/jspsych/css/jspsych.css" rel="stylesheet" type="text/css" />
         <style>
             /* set canvas to be full screen by default */
             .jspsych-content {
@@ -63,9 +56,15 @@
         var timeline = []
 
         var jsPsych = initJsPsych({
-            // on_finish: function () {
-            //     jsPsych.data.displayData("json") // Display data in browser
-            // },
+            on_finish: function () {
+                // jsPsych.data.displayData("json") // Display data in browser
+                let info = jsPsych.data.get().filter({ screen: "browser_info" }).values()[0]
+                if (info["prolific_id"] != undefined) {
+                    window.location = "https://realitybending.github.io/"
+                } else {
+                    window.location = "https://realitybending.github.io/research/#participate"
+                }
+            },
         })
 
         // Enter fullscreen mode
@@ -82,12 +81,7 @@
         timeline.push(demographics_info)
 
         // Questionnaires ======================================================
-        var Qs = [
-            ipip6_questionnaire,
-            pid5_questionnaire,
-            sss_questionnaire,
-            mist_questionnaire,
-        ]
+        var Qs = [ipip6_questionnaire, pid5_questionnaire, sss_questionnaire, mist_questionnaire]
         Qs = jsPsych.randomization.shuffle(Qs) // Randomize order
 
         // Start with first questionnaire
@@ -130,7 +124,7 @@
 
         timeline.push(
             demographics_endscreen(
-                "https://realitybending.github.io/IllusionGameSuggestibility/experiment"
+                "https://realitybending.github.io/IllusionGameSuggestibility/experiment?exp=snow"
             )
         )
 
