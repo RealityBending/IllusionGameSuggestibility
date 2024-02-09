@@ -1,7 +1,7 @@
 import json
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import seaborn as sns
 
 
@@ -39,15 +39,17 @@ files = osf_listfiles(
     after_date="13/12/2023",
 )
 
-
 # Loop through files ======================================================
 alldata_sub = pd.DataFrame()  # Initialize empty dataframe
 alldata_ig = pd.DataFrame()  # Initialize empty dataframe
 sona_ids = {}
+prolific_ids = {}
 
 for i, file in enumerate(files):
     print(f"File N°{i+1}/{len(files)}")
 
+    # if file["name"] in alldata_sub["Participant"].values:
+    #     continue
     data = pd.read_csv(file["file"]._get(file["url"], stream=True).raw)
 
     # Participant ========================================================
@@ -61,6 +63,9 @@ for i, file in enumerate(files):
         experimenter = "Experimenter1"
     else:
         experimenter = browser["researcher"]
+    if "prolific_id" in browser.index:
+        if isinstance(browser["prolific_id"], str):
+            experimenter = "Prolific"
     if isinstance(experimenter, float):
         experimenter = "Experimenter" + str(int(experimenter))
 
@@ -81,6 +86,18 @@ for i, file in enumerate(files):
         index=[0],
     )
 
+    if experimenter == "Prolific":
+        id = browser["prolific_id"]
+        if id not in [
+            "5d9b60eb027b56001220d84e",
+            "631745a70c7c585248df1a5d",
+            "5714e0958adadb00098deed4",
+            "59d4fac0d1ab390001da2e46",
+            "5ed934c19e6b4a496cd6da06",
+            "645bc6fcd55cf9db562b97f8",
+        ]:
+            prolific_ids[file["name"]] = id
+
     if "sona_id" in browser.index:
         if np.isnan(browser["sona_id"]) == False:
             id = int(browser["sona_id"])
@@ -91,6 +108,7 @@ for i, file in enumerate(files):
                 29913,
                 30623,
                 30633,
+                30636,
                 30645,
                 30644,
                 30675,
@@ -98,29 +116,51 @@ for i, file in enumerate(files):
                 30695,
                 30722,
                 30725,
+                30733,
+                30756,
                 30760,
                 30768,
                 30772,
+                30779,
+                30784,
+                30791,
+                30804,
                 30809,
                 30839,
                 30827,
-                # 30854,
+                30850,
+                30854,  # Doesn't show up in records
                 30862,
                 30872,
                 30876,
                 30885,
                 30889,
                 30901,
+                30954,
                 30993,
                 31037,
                 31060,
                 31065,
+                31073,
+                31080,
+                31100,
+                31101,
+                31667,
+                31717,
+                31720,
                 31728,
                 31731,
+                31742,
+                31753,
+                31762,
+                31766,
+                31774,
                 31777,
                 31783,
+                31801,
                 31810,
                 31822,
+                31838,
                 31852,  # Awarded 0
                 31857,
                 31864,
@@ -128,12 +168,25 @@ for i, file in enumerate(files):
                 31827,
                 31852,
                 31853,
+                31867,
+                31868,
                 31885,
+                31915,
                 31923,
                 31935,
+                31972,
                 31978,
+                31988,
+                32014,
+                32045,
+                32046,
+                32057,
                 32068,
+                32078,
                 32085,
+                32098,
+                32110,
+                32114,
                 32148,
                 32161,
                 32165,
@@ -162,11 +215,7 @@ for i, file in enumerate(files):
 
     # Ethnicity
     race = demo2["ethnicity"].title().rstrip()
-    race = (
-        "Caucasian"
-        if race in ["British", "White British", "Czech", "European", "Nederlander"]
-        else race
-    )
+    race = "Caucasian" if race in ["British", "White British", "Czech", "European", "Nederlander"] else race
     race = "Mixed" if race in ["Caucasion Metis"] else race
     race = "South Asian" if race in ["Indian"] else race
     race = np.nan if race in [""] else race
@@ -176,9 +225,7 @@ for i, file in enumerate(files):
 
     # Manual fix (2 first participants had duplicated questionnaires)
     if file["name"] in ["8va2haolh5", "exgf9of50l"]:
-        data.loc[data["screen"][data["trial_type"] == "survey"].index, "screen"] = (
-            "questionnaire_mist"
-        )
+        data.loc[data["screen"][data["trial_type"] == "survey"].index, "screen"] = "questionnaire_mist"
         if file["name"] == "exgf9of50l":
             data = data.drop(data[data["screen"] == "questionnaire_mist"].index[1])
             data = data.drop(data[data["screen"] == "questionnaire_ipip6"].index[1])
@@ -240,13 +287,10 @@ for i, file in enumerate(files):
     ig = data[data["screen"] == "IG_Trial"]
     ig = ig[ig["block"] != "Practice"]
 
-    df_ig = ig[
-        ["Illusion_Type", "Illusion_Difference", "Illusion_Strength"]
-    ].reset_index(drop=True)
+    df_ig = ig[["Illusion_Type", "Illusion_Difference", "Illusion_Strength"]].reset_index(drop=True)
     df_ig["Participant"] = file["name"]
     df_ig["File"] = [
-        s.replace("https://realitybending.github.io/IllusionGame/v3/stimuli/", "")
-        for s in ig["stimulus"].values
+        s.replace("https://realitybending.github.io/IllusionGame/v3/stimuli/", "") for s in ig["stimulus"].values
     ]
     df_ig["Block"] = ig["block"].values
     df_ig["Trial"] = ig["trial_number"].values
@@ -263,41 +307,45 @@ for i, file in enumerate(files):
 
     alldata_ig = pd.concat([alldata_ig, df_ig], ignore_index=True)
 
-# Save data ==============================================================
 
-# SONA check =============================================================
+# Checks ===================================================================
+# SONA -------------------------------------------------------------------
 if len(sona_ids) > 0:
-    # np.sort([int(k[1]) for k in sona_ids.items()])
-    d = alldata_ig[
-        [i in list(sona_ids.keys()) for i in alldata_ig["Participant"].values]
-    ]
+    d = alldata_ig[[i in list(sona_ids.keys()) for i in alldata_ig["Participant"].values]]
     d.loc[:, "Participant"] = [str(sona_ids[i]) for i in d["Participant"].values]
+    d = alldata_ig.loc[0:2000,]
     # d = d[[x in ["31852"] for x in d.Participant]]
-    sns.kdeplot(data=d[d.Block == "A"], x="RT", hue="Participant", bw_adjust=0.5).set(
-        xlim=(0, 3)
-    )
-    sns.kdeplot(
-        data=d[d.Block == "B"], x="RT", hue="Participant", bw_adjust=0.5, linestyle="--"
-    ).set(xlim=(0, 3))
+    sns.kdeplot(data=d[d.Block == "A"], x="RT", hue="Participant", bw_adjust=0.5).set(xlim=(0, 3))
+    sns.kdeplot(data=d[d.Block == "B"], x="RT", hue="Participant", bw_adjust=0.5, linestyle="--").set(xlim=(0, 3))
+    print(np.sort([int(k[1]) for k in sona_ids.items()]))
 # sona = np.sort(alldata_sub["SONA_ID"].unique())
 # sona = sona[~np.isnan(sona)].astype(int)
 # 30868 in sona
 
+# Prolific ----------------------------------------------------------------
+if len(prolific_ids) > 0:
+    d = alldata_ig[[i in list(prolific_ids.keys()) for i in alldata_ig["Participant"].values]]
+    d.loc[:, "Participant"] = [str(prolific_ids[i]) for i in d["Participant"].values]
+    # d = d[[x in ["31852"] for x in d.Participant]]
+    sns.kdeplot(data=d[d.Block == "A"], x="RT", hue="Participant", bw_adjust=0.5).set(xlim=(0, 3))
+    sns.kdeplot(data=d[d.Block == "B"], x="RT", hue="Participant", bw_adjust=0.5, linestyle="--").set(xlim=(0, 3))
+    print(np.sort([k[1] for k in prolific_ids.items()]))
+
+# Save data ==============================================================
 
 # Remove columns
-alldata_sub = alldata_sub.drop(
-    columns=["Time", "Browser", "Platform", "Screen_Width", "Screen_Height", "SONA_ID"]
-)
+alldata_sub = alldata_sub.drop(columns=["Time", "Browser", "Platform", "Screen_Width", "Screen_Height", "SONA_ID"])
 # Inspect ================================================================
 # alldata_sub["Experimenter"].unique()
 # alldata_sub["Ethnicity"].unique()
 
 # Reanonimize ============================================================
-alldata_sub = alldata_sub.sort_values(by=["Date_OSF"]).reset_index(drop=True)
+alldata_sub["d"] = pd.to_datetime(alldata_sub["Date"] + " " + alldata_sub["Time"], format="%d/%m/%Y %H:%M:%S")
+alldata_sub = alldata_sub.sort_values(by=["d"]).reset_index(drop=True)
 correspondance = {j: f"S{i+1:03}" for i, j in enumerate(alldata_sub["Participant"])}
 alldata_sub["Participant"] = [correspondance[i] for i in alldata_sub["Participant"]]
 alldata_ig["Participant"] = [correspondance[i] for i in alldata_ig["Participant"]]
-alldata_sub = alldata_sub.drop(columns=["Date_OSF"])  # Drop OSf column
+alldata_sub = alldata_sub.drop(columns=["Date_OSF", "d"])  # Drop OSf column
 
 # Save
 alldata_sub.to_csv("../data/rawdata_participants.csv", index=False)

@@ -146,6 +146,7 @@ dfsub |>
 
 ### Experiment Duration
 
+The experiment's median duration is `r insight::format_value(median(dfsub$Experiment_Duration))` min (`r insight::format_ci(bayestestR::hdi(dfsub$Experiment_Duration, ci=0.5))`).
 
 ```{r}
 dfsub |>
@@ -234,7 +235,7 @@ plot_distribution <- function(df) {
     theme(axis.text.y = element_blank(),
           axis.line.y = element_blank(),
           strip.text.y = element_text(size = rel(0.6))) +
-    facet_wrap(~Participant) +
+    facet_wrap(~Participant, nrow=5) +
     labs(y = "", x = "Reaction Time (s)")
 }
 ```
@@ -401,6 +402,7 @@ table <- dfsub |>
 data.frame(Participant = c("Average"), t(sapply(table[2:ncol(table)], mean, na.rm = TRUE))) |>
   rbind(table) |> 
   gt::gt() |> 
+  gt::fmt_number() |> 
   gt::data_color(columns = "Participant", fn=\(x) ifelse(x %in% outliers_half, "orange", "white")) |>
   gt::data_color(columns = ends_with("Duration"), 
                  direction="column", palette = "RdBu") |> 
