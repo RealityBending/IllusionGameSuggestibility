@@ -38,6 +38,7 @@ sona_credited = [
     27027,
     28388,
     29913,
+    30618,
     30623,
     30633,
     30636,
@@ -54,6 +55,7 @@ sona_credited = [
     30760,
     30768,
     30772,
+    30777,
     30779,
     30784,
     30791,
@@ -111,6 +113,7 @@ sona_credited = [
     31838,
     31852,  # Awarded 0
     31857,
+    31862,
     31863,
     31864,
     31865,
@@ -228,8 +231,6 @@ for i, file in enumerate(files):
         if np.isnan(browser["sona_id"]) == False:
             id = int(browser["sona_id"])
             df["SONA_ID"] = id
-            if id not in sona_credited:
-                sona_ids[file["name"]] = id
 
     # Demographics -------------------------------------------------------
     demo1 = data[data["screen"] == "demographics_1"].iloc[0]
@@ -253,11 +254,7 @@ for i, file in enumerate(files):
 
     # Ethnicity
     race = demo2["ethnicity"].title().rstrip()
-    race = (
-        "Caucasian"
-        if race in ["British", "White British", "Czech", "European", "Nederlander"]
-        else race
-    )
+    race = "Caucasian" if race in ["British", "White British", "Czech", "European", "Nederlander"] else race
     race = "Mixed" if race in ["Caucasion Metis"] else race
     race = "South Asian" if race in ["Indian"] else race
     race = np.nan if race in [""] else race
@@ -267,9 +264,7 @@ for i, file in enumerate(files):
 
     # Manual fix (2 first participants had duplicated questionnaires)
     if file["name"] in ["8va2haolh5", "exgf9of50l"]:
-        data.loc[data["screen"][data["trial_type"] == "survey"].index, "screen"] = (
-            "questionnaire_mist"
-        )
+        data.loc[data["screen"][data["trial_type"] == "survey"].index, "screen"] = "questionnaire_mist"
         if file["name"] == "exgf9of50l":
             data = data.drop(data[data["screen"] == "questionnaire_mist"].index[1])
             data = data.drop(data[data["screen"] == "questionnaire_ipip6"].index[1])
@@ -331,13 +326,10 @@ for i, file in enumerate(files):
     ig = data[data["screen"] == "IG_Trial"]
     ig = ig[ig["block"] != "Practice"]
 
-    df_ig = ig[
-        ["Illusion_Type", "Illusion_Difference", "Illusion_Strength"]
-    ].reset_index(drop=True)
+    df_ig = ig[["Illusion_Type", "Illusion_Difference", "Illusion_Strength"]].reset_index(drop=True)
     df_ig["Participant"] = file["name"]
     df_ig["File"] = [
-        s.replace("https://realitybending.github.io/IllusionGame/v3/stimuli/", "")
-        for s in ig["stimulus"].values
+        s.replace("https://realitybending.github.io/IllusionGame/v3/stimuli/", "") for s in ig["stimulus"].values
     ]
     df_ig["Block"] = ig["block"].values
     df_ig["Trial"] = ig["trial_number"].values
@@ -357,11 +349,7 @@ for i, file in enumerate(files):
 
 # Checks ===================================================================
 # SONA -------------------------------------------------------------------
-alldata_ig["SONA_ID"] = (
-    alldata_sub.set_index("Participant")
-    .loc[alldata_ig["Participant"].values]["SONA_ID"]
-    .values
-)
+alldata_ig["SONA_ID"] = alldata_sub.set_index("Participant").loc[alldata_ig["Participant"].values]["SONA_ID"].values
 
 
 d = alldata_ig[~np.isnan(alldata_ig["SONA_ID"])]
@@ -369,36 +357,24 @@ d = d[~np.isin(d["SONA_ID"].values, sona_credited)]
 d.loc[:, "SONA_ID"] = d["SONA_ID"].astype(int).astype(str).values
 d = d.sort_values(by=["SONA_ID", "Block", "Trial"])
 # d = d[[x in ["31852"] for x in d.Participant]]
-sns.kdeplot(data=d[d.Block == "A"], x="RT", hue="SONA_ID", bw_adjust=0.5).set(
-    xlim=(0, 3)
-)
-sns.kdeplot(
-    data=d[d.Block == "B"], x="RT", hue="SONA_ID", bw_adjust=0.5, linestyle="--"
-).set(xlim=(0, 3))
+sns.kdeplot(data=d[d.Block == "A"], x="RT", hue="SONA_ID", bw_adjust=0.5).set(xlim=(0, 3))
+sns.kdeplot(data=d[d.Block == "B"], x="RT", hue="SONA_ID", bw_adjust=0.5, linestyle="--").set(xlim=(0, 3))
 print(d["SONA_ID"].unique())
 
 
 # Prolific ----------------------------------------------------------------
 if len(prolific_ids) > 0:
-    d = alldata_ig[
-        [i in list(prolific_ids.keys()) for i in alldata_ig["Participant"].values]
-    ]
+    d = alldata_ig[[i in list(prolific_ids.keys()) for i in alldata_ig["Participant"].values]]
     d.loc[:, "Participant"] = [str(prolific_ids[i]) for i in d["Participant"].values]
     # d = d[[x in ["31852"] for x in d.Participant]]
-    sns.kdeplot(data=d[d.Block == "A"], x="RT", hue="Participant", bw_adjust=0.5).set(
-        xlim=(0, 3)
-    )
-    sns.kdeplot(
-        data=d[d.Block == "B"], x="RT", hue="Participant", bw_adjust=0.5, linestyle="--"
-    ).set(xlim=(0, 3))
+    sns.kdeplot(data=d[d.Block == "A"], x="RT", hue="Participant", bw_adjust=0.5).set(xlim=(0, 3))
+    sns.kdeplot(data=d[d.Block == "B"], x="RT", hue="Participant", bw_adjust=0.5, linestyle="--").set(xlim=(0, 3))
     print(np.sort([k[1] for k in prolific_ids.items()]))
 
 # Save data ==============================================================
 
 # Remove columns
-alldata_sub = alldata_sub.drop(
-    columns=["Time", "Browser", "Platform", "Screen_Width", "Screen_Height", "SONA_ID"]
-)
+alldata_sub = alldata_sub.drop(columns=["Time", "Browser", "Platform", "Screen_Width", "Screen_Height", "SONA_ID"])
 alldata_ig = alldata_ig.drop(columns=["SONA_ID"])
 
 # Inspect ================================================================
@@ -406,9 +382,7 @@ alldata_ig = alldata_ig.drop(columns=["SONA_ID"])
 # alldata_sub["Ethnicity"].unique()
 
 # Reanonimize ============================================================
-alldata_sub["d"] = pd.to_datetime(
-    alldata_sub["Date"] + " " + alldata_sub["Time"], format="%d/%m/%Y %H:%M:%S"
-)
+alldata_sub["d"] = pd.to_datetime(alldata_sub["Date"] + " " + alldata_sub["Time"], format="%d/%m/%Y %H:%M:%S")
 alldata_sub = alldata_sub.sort_values(by=["d"]).reset_index(drop=True)
 correspondance = {j: f"S{i+1:03}" for i, j in enumerate(alldata_sub["Participant"])}
 alldata_sub["Participant"] = [correspondance[i] for i in alldata_sub["Participant"]]
