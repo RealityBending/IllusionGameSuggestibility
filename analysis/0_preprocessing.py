@@ -41,7 +41,9 @@ sona_credited = [
     30605,
     30618,
     30623,
+    30624,
     30633,
+    30634,
     30636,
     30645,
     30644,
@@ -52,16 +54,20 @@ sona_credited = [
     30695,
     30722,
     30725,
+    31729,
     30733,
     30737,
     30756,
     30760,
     30768,
+    31770,
     30772,
     30777,
     30779,
     30784,
+    31788,
     30791,
+    30800,
     30804,
     30806,
     30809,
@@ -80,6 +86,7 @@ sona_credited = [
     30889,
     30901,
     # 30935,   # Doesn't show up in records
+    30956,
     30948,
     30954,
     30966,
@@ -142,15 +149,18 @@ sona_credited = [
     31867,
     31868,
     31885,
+    31895,
     31902,
     31903,
     31911,
     31914,
     31915,
     31923,
+    31925,
     31930,
     31935,
     31938,
+    31943,
     31953,
     31961,  # Awarded half
     31967,
@@ -188,6 +198,7 @@ sona_credited = [
     32161,
     32165,
     32168,
+    32180,
     32182,
     32184,
     32186,
@@ -196,7 +207,6 @@ sona_credited = [
     32244,
     32260,
 ]
-
 
 token = "zYboMoukFI8HKabenQ35DH6tESHJo6oZll5BvOPma6Dppjqc2jnIB6sPCERCuaqO0UrHAa"  # Paste OSF token here to access private repositories
 files = osf_listfiles(
@@ -213,7 +223,7 @@ prolific_ids = {}
 for i, file in enumerate(files):
     print(f"File N°{i+1}/{len(files)}")
 
-    if not alldata_sub.empty:
+    if not alldata_sub.empty: # Correcting for Key Error for first iteration on empty df
         if file["name"] in alldata_sub["Participant"].values:
             continue
     data = pd.read_csv(file["file"]._get(file["url"], stream=True).raw)
