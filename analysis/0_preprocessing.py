@@ -213,10 +213,11 @@ prolific_ids = {}
 for i, file in enumerate(files):
     print(f"File N°{i+1}/{len(files)}")
 
-    if file["name"] in alldata_sub["Participant"].values:
-        continue
+    if not alldata_sub.empty:
+        if file["name"] in alldata_sub["Participant"].values:
+            continue
     data = pd.read_csv(file["file"]._get(file["url"], stream=True).raw)
-
+    
     # Participant ========================================================
     # data["screen"].unique()
 
