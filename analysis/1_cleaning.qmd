@@ -26,7 +26,8 @@ library(ggside)
 ```{r}
 #| code-fold: false
 
-dfsub <- read.csv("../data/rawdata_participants.csv")
+dfsub <- read.csv("../data/rawdata_participants.csv") |> 
+   mutate(across(everything(), ~ifelse(.x == "", NA, .x))) 
 df <- read.csv("../data/rawdata_IllusionGame.csv") |> 
   group_by(Illusion_Type) |> 
   mutate(Illusion_Effect = ifelse(sign(Illusion_Strength) > 0, "Incongruent", "Congruent"),
@@ -176,8 +177,8 @@ dfsub |>
 ## Exclusion
 
 ```{r}
-outliers <- c("S044")
-outliers_half <- c("S031", "S036", "S051")
+outliers <- c("S043", "S079")
+outliers_half <- c("S032", "S049")
 ```
 
 
@@ -193,11 +194,12 @@ errorrate <- df |>
   ungroup() |>
   arrange(desc(ErrorRate_per_block))
 
-plot_distribution <- function(df) {
-  d_all <- estimate_density(df, select = "RT")
+d_all <- estimate_density(filter(df, RT < 3)$RT)
+
+plot_distribution <- function(dat) {
   
   data_error <- errorrate |>
-    filter(Participant %in% unique(df$Participant)) |>
+    filter(Participant %in% unique(dat$Participant)) |>
     group_by(Participant, Block) |>
     summarize(y = mean(ErrorRate_per_block), .groups="drop") |>
     mutate(x = ifelse(Block == "A", 2.1, 2.3),
@@ -207,13 +209,14 @@ plot_distribution <- function(df) {
               TRUE ~ "blue"
             ))
   
-  df |>
+  dat |>
+    filter(RT < 3) |>
     estimate_density(select = "RT", at = c("Participant", "Block")) |>
     group_by(Participant) |>
     normalize(select = "y") |>
     ungroup() |>
     mutate(
-      Participant = fct_relevel(Participant, sort(unique(df$Participant))),
+      Participant = fct_relevel(Participant, sort(unique(dat$Participant))),
       color = case_when(
         Participant %in% outliers ~ "red",
         Participant %in% outliers_half ~ "orange",
@@ -224,49 +227,51 @@ plot_distribution <- function(df) {
     geom_bar(data = data_error, aes(fill = color), stat = "identity", width=0.19) +
     geom_segment(aes(x = 2, xend = 2.4, y = 0.5, yend = 0.5), color = "black", linetype="dashed", linewidth = 0.5) +
     geom_area(data = normalize(d_all, select = "y"), alpha = 0.2) +
-    geom_line(aes(color = color, group = interaction(Participant, Block), linetype = Block), linewidth = 0.5) +
+    geom_line(aes(color = color, group = interaction(Participant, Block), linetype = Block), linewidth = 0.8) +
     # geom_vline(xintercept = 0.125, linetype = "dashed", color = "red", size = 0.5) +
     scale_color_manual(values = c("red" = "#F44336", "orange" = "#FF9800", "blue" = "blue"), guide = "none") +
     scale_fill_manual(values = c("red" = "#F44336", "orange" = "#FF9800", "blue" = "blue"), guide = "none") +
-    scale_x_continuous(expand = c(0, 0)) +
+    scale_x_continuous(expand = c(0, 0), breaks=c(0, 0.5, 1, 1.5, 2), labels=c("0", "0.5", "1", "1.5", "2")) +
     scale_y_continuous(expand = c(0, 0)) +
     coord_cartesian(xlim = c(0, 2.4)) +
     theme_modern() +
     theme(axis.text.y = element_blank(),
           axis.line.y = element_blank(),
-          strip.text.y = element_text(size = rel(0.6))) +
-    facet_wrap(~Participant, nrow=5) +
+          strip.text.x = element_text(size = rel(1.5)),
+          legend.position = "none") +
+    facet_wrap(~Participant, nrow=10) +
     labs(y = "", x = "Reaction Time (s)")
 }
 ```
 
 ::: {.panel-tabset}
 
-#### 1-40
+#### 1-100
 
 ```{r}
 #| fig-width: 15
-#| fig-height: 20
+#| fig-height: 15
 
-plot_distribution(df[df$Participant %in% dfsub$Participant[1:40], ])
+plot_distribution(df[df$Participant %in% dfsub$Participant[1:100], ])
 ```
 
-#### 40-80
+#### 101-200
+
 
 ```{r}
 #| fig-width: 15
-#| fig-height: 20
+#| fig-height: 15
 
-plot_distribution(df[df$Participant %in% dfsub$Participant[41:80], ])
+plot_distribution(df[df$Participant %in% dfsub$Participant[101:200], ])
 ```
-
 
 :::
 
-We discarded `r length(outliers_half)` participant's second blocks.
+We discarded `r length(outliers)` participants (entirely) and `r length(outliers_half)` participant's second blocks.
 
 ```{r}
 df <- df |> 
+  filter(!Participant %in% outliers) |> 
   filter(!((Block == "B") & (Participant %in% outliers_half)))
 ```
 
@@ -285,7 +290,7 @@ errorrate |>
   scale_y_continuous(expand = c(0, 0)) +
   scale_color_manual(values = c("Ebbinghaus" = "#2196F3", "MullerLyer" = "#4CAF50", "VerticalHorizontal" = "#FF5722")) +
   labs(y = "Distribution", x = "Error Rate") +
-  theme_modern() 
+  theme_modern()
 
 remove_badblocks <- function(df) {
   n <- nrow(df)
@@ -295,7 +300,7 @@ remove_badblocks <- function(df) {
     ungroup() |>
     filter(ErrorRate_per_block < 0.5) |>
     select(-ErrorRate_per_block)
-  
+
   text <- paste0(
     "We removed ",
     n - nrow(df),
@@ -388,27 +393,27 @@ df <- out$data
 
 
 ```{r}
-outliers <- dfsub |> 
-  select(IPIP6_SD, IPIP6_Duration, PID5_SD, PID5_Duration, SSS_SD, SSS_Duration) |> 
-  standardize(robust=TRUE) |> 
-  mutate(SD = rowSums(across(ends_with("SD"))), Duration = rowSums(across(ends_with("Duration")))) 
-                              
-table <- dfsub |> 
-  select(Participant, IPIP6_SD, IPIP6_Duration, PID5_SD, PID5_Duration, SSS_SD, SSS_Duration) |> 
+outliers <- dfsub |>
+  select(IPIP6_SD, IPIP6_Duration, PID5_SD, PID5_Duration, SSS_SD, SSS_Duration) |>
+  standardize(robust=TRUE) |>
+  mutate(SD = rowSums(across(ends_with("SD"))), Duration = rowSums(across(ends_with("Duration"))))
+
+table <- dfsub |>
+  select(Participant, IPIP6_SD, IPIP6_Duration, PID5_SD, PID5_Duration, SSS_SD, SSS_Duration) |>
   mutate_at(vars(ends_with("Duration")), \(x) ifelse(x > 10, 10, x)) |>
-  mutate(Participant = fct_reorder(Participant, desc(outliers$SD))) |> 
+  mutate(Participant = fct_reorder(Participant, desc(outliers$SD))) |>
   arrange(Participant)
 
 data.frame(Participant = c("Average"), t(sapply(table[2:ncol(table)], mean, na.rm = TRUE))) |>
-  rbind(table) |> 
-  gt::gt() |> 
-  gt::fmt_number() |> 
+  rbind(table) |>
+  gt::gt() |>
+  gt::fmt_number() |>
   gt::data_color(columns = "Participant", fn=\(x) ifelse(x %in% outliers_half, "orange", "white")) |>
-  gt::data_color(columns = ends_with("Duration"), 
-                 direction="column", palette = "RdBu") |> 
-  gt::data_color(columns = ends_with("SD"), 
-                 direction="column", palette = "RdBu", reverse=TRUE) |> 
-  gt::data_color(direction="row", rows=1, palette = "grey") |> 
+  gt::data_color(columns = ends_with("Duration"),
+                 direction="column", palette = "RdBu") |>
+  gt::data_color(columns = ends_with("SD"),
+                 direction="column", palette = "RdBu", reverse=TRUE) |>
+  gt::data_color(direction="row", rows=1, palette = "grey") |>
   gt::opt_interactive(use_compact_mode = TRUE)
 ```
 
@@ -425,7 +430,7 @@ df <- filter(df, Participant %in% dfsub$Participant)
 
 ```{r}
 p_age <- estimate_density(dfsub$Age) |>
-  normalize(select = y) |> 
+  normalize(select = y) |>
   mutate(y = y * 86) |>  # To match the binwidth
   ggplot(aes(x = x)) +
   geom_histogram(data=dfsub, aes(x = Age, fill=Gender), bins=28) +
@@ -448,36 +453,14 @@ p_age
 ```
 
 
-<!-- ## Ethnicity -->
 
-<!-- ```{r p_demographics_ethnicity} -->
-<!-- plot_waffle <- function(sub, what = "Nationality", title = what, rows = 8, size = 3) { -->
-<!--   ggwaffle::waffle_iron(sub, what, rows = rows) |> -->
-<!--     ggplot(aes(x, y)) + -->
-<!--     geom_point(aes(color = group), shape = "square", size = size) + -->
-<!--     coord_equal() + -->
-<!--     ggtitle(title) + -->
-<!--     labs(fill = "", color = "", subtitle = "N participants per self-declared group") + # (each square represents one participant)" -->
-<!--     theme_void() + -->
-<!--     theme( -->
-<!--       plot.title = element_text(size = rel(1.2), face = "bold", hjust = 0), -->
-<!--       plot.subtitle = element_text(size = rel(1.2)), -->
-<!--       legend.key.height = unit(1, "mm"), -->
-<!--       legend.key.width = unit(1, "mm") -->
-<!--     ) -->
-<!-- } -->
-
-<!-- p_ethni <- plot_waffle(sub, "Ethnicity", rows = 20, size = 8) + -->
-<!--   scale_color_manual(values = c("Hispanic" = "#FF5722", "Caucasian" = "#2196F3", "African" = "#4CAF50", "Asian" = "#FFC107", "Other" = "#795548")) -->
-<!-- p_ethni -->
-<!-- ``` -->
 
 
 ### Education
 
 ```{r}
 p_edu <- dfsub |>
-  mutate(Education = fct_relevel(Education, "Other", "High School", "Bachelor", "Master", "Doctorate")) |> 
+  mutate(Education = fct_relevel(Education, "Other", "High School", "Bachelor", "Master", "Doctorate")) |>
   ggplot(aes(x = Education)) +
   geom_bar(aes(fill = Education)) +
   scale_y_continuous(expand = c(0, 0), breaks= scales::pretty_breaks()) +
@@ -496,11 +479,31 @@ p_edu
 
 
 
+### Ethnicity
+
+```{r p_ethnicity}
+ggwaffle::waffle_iron(dfsub, ggwaffle::aes_d(group = Ethnicity), rows=10) |> 
+  ggplot(aes(x, y, fill = group)) + 
+  ggwaffle::geom_waffle() + 
+  coord_equal() + 
+  scale_fill_flat_d() + 
+  ggwaffle::theme_waffle() +
+  labs(title = "Self-reported Ethnicity", subtitle = "Each square represents a participant", fill="")  +
+  theme(
+    plot.title = element_text(size = rel(1.2), face = "bold", hjust = 0),
+    plot.subtitle = element_text(size = rel(1.2)),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank()
+  )
+```
+
+
+
 ### Summary
 
 The final sample includes `r report::report_participants(dfsub, age="Age", sex="Sex", education="Education")`.
 
-## Save 
+## Save
 
 ```{r}
 #| code-fold: false
