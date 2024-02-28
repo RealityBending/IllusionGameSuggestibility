@@ -320,6 +320,7 @@ for i, file in enumerate(files):
             "White (British)",
             "White Other",
             "White, British",
+            "White", 
         ]
         else race
     )
