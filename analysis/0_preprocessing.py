@@ -93,6 +93,7 @@ sona_credited = [
     # 30854,  # Doesn't show up in records
     30857,
     30862,
+    30868,
     30872,
     30876,
     30884,
@@ -119,6 +120,7 @@ sona_credited = [
     31065,
     31073,
     31080,
+    31086,
     31087,
     31100,
     31110,
@@ -218,6 +220,7 @@ sona_credited = [
     32030,
     32033,
     32036,
+    32041,
     32043,
     32045,
     32046,
@@ -240,6 +243,7 @@ sona_credited = [
     32097,
     32098,
     32106,
+    32107,
     32109,
     32110,
     32114,
@@ -262,10 +266,11 @@ sona_credited = [
     32188,
     32191,
     32244,
+    32252, # Awarded 0
     32260,
 ]
 
-token = "zYboMoukFI8HKabenQ35DH6tESHJo6oZll5BvOPma6Dppjqc2jnIB6sPCERCuaqO0UrHAa"  # Paste OSF token here to access private repositories
+token = ""  # Paste OSF token here to access private repositories
 files = osf_listfiles(
     token=token,
     data_subproject="6xdz9",  # Data subproject ID
