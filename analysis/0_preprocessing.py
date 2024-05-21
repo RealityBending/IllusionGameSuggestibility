@@ -79,7 +79,7 @@ sona_credited = [
     30737,
     30746,
     30748,  # Award 0 but not in records
-    30749, # Awarded 0
+    30749,  # Awarded 0
     30754,
     30756,
     30758,
@@ -104,7 +104,7 @@ sona_credited = [
     30809,
     30817,
     30818,
-    30824, # Awarded 0
+    30824,  # Awarded 0
     30839,
     30827,
     30832,
@@ -120,6 +120,7 @@ sona_credited = [
     30868,
     30872,
     30876,
+    30880,
     30884,
     30885,
     30888,
@@ -130,8 +131,8 @@ sona_credited = [
     30924,
     30925,
     30950,
-    30935, # Doesn't show up in records
-    30939
+    30935,  # Doesn't show up in records
+    30939,
     30956,
     30948,
     30953,
@@ -167,9 +168,12 @@ sona_credited = [
     31673,
     31717,
     31720,
+    31723,
     31726,
+    31727,
     31728,
     31731,
+    31734,
     31736,
     31741,
     31742,
@@ -189,6 +193,7 @@ sona_credited = [
     31774,
     31776,
     31777,
+    31778,
     31783,
     31787,
     31796,
@@ -233,6 +238,7 @@ sona_credited = [
     31885,
     31886,
     31889,
+    31891,
     31895,
     31896,
     31897,
@@ -253,6 +259,7 @@ sona_credited = [
     31938,
     31940,
     31943,
+    31946,
     31950,
     31953,
     31955,
@@ -264,10 +271,12 @@ sona_credited = [
     31962,
     31967,
     31968,  # Awarded half
+    31970,
     31972,
     31973,
     31975,
     31978,
+    31981,
     31984,
     31985,
     31987,
@@ -320,7 +329,7 @@ sona_credited = [
     32086,
     32088,
     32089,
-    32090, # Awarded 0 
+    32090,  # Awarded 0
     32091,
     32097,
     32098,
@@ -342,7 +351,7 @@ sona_credited = [
     32133,
     32138,
     32123,
-    32136, # Awarded half
+    32136,  # Awarded half
     32148,
     32151,
     32152,
@@ -369,7 +378,7 @@ sona_credited = [
     32260,
 ]
 
-token = "zYboMoukFI8HKabenQ35DH6tESHJo6oZll5BvOPma6Dppjqc2jnIB6sPCERCuaqO0UrHAa"  # Paste OSF token here to access private repositories
+token = ""  # Paste OSF token here to access private repositories
 files = osf_listfiles(
     token=token,
     data_subproject="6xdz9",  # Data subproject ID
