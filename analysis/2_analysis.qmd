@@ -1,0 +1,38 @@
+---
+title: "IllusionGameSuggestibility - Data Analysis"
+editor: source
+editor_options: 
+  chunk_output_type: console
+format:
+  html:
+    code-fold: true
+    self-contained: false
+    toc: true
+---
+
+## Data Preparation
+
+```{r}
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(easystats)
+library(patchwork)
+library(ggside)
+```
+
+
+```{r}
+#| code-fold: false
+
+dfsub <- read.csv("https://realitybending.github.io/IllusionGameSuggestibility/data/data_participants.csv") 
+
+df <- read.csv("https://realitybending.github.io/IllusionGameSuggestibility/data/data_IllusionGame.csv")
+```
+
+```{r}
+#| code-fold: false
+
+head(dfsub)
+```

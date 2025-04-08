@@ -37,6 +37,8 @@ df <- read.csv("../data/rawdata_IllusionGame.csv") |>
            labels=c("Congruent - Strong", "Congruent - Mild", "Incongruent - Mild", "Incongruent - Strong")),
          Condition_Difficulty = datawizard::categorize(Task_Difficulty, split="quantile", n_groups=2, labels=c("Hard", "Easy"))) |> 
   ungroup()
+
+# table(dfsub$Experimenter)
 ```
 
 The initial sample consisted of `r report::report_participants(dfsub, age="Age", gender="Gender", education="Education")`, for a total trial number of `r nrow(df)`.
