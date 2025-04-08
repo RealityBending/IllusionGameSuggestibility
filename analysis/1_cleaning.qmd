@@ -253,6 +253,7 @@ plot_distribution <- function(dat) {
 ```{r}
 #| fig-width: 15
 #| fig-height: 15
+#| eval: false
 
 plot_distribution(df[df$Participant %in% dfsub$Participant[1:100], ])
 ```
@@ -263,6 +264,7 @@ plot_distribution(df[df$Participant %in% dfsub$Participant[1:100], ])
 ```{r}
 #| fig-width: 15
 #| fig-height: 15
+#| eval: false
 
 plot_distribution(df[df$Participant %in% dfsub$Participant[101:200], ])
 ```
@@ -272,9 +274,9 @@ plot_distribution(df[df$Participant %in% dfsub$Participant[101:200], ])
 We discarded `r length(outliers)` participants (entirely) and `r length(outliers_half)` participant's second blocks.
 
 ```{r}
-df <- df |> 
-  filter(!Participant %in% outliers) |> 
-  filter(!((Block == "B") & (Participant %in% outliers_half)))
+# df <- df |> 
+#   filter(!Participant %in% outliers) |> 
+#   filter(!((Block == "B") & (Participant %in% outliers_half)))
 ```
 
 
@@ -283,6 +285,8 @@ df <- df |>
 For each block, we computed the error rate and, if more than 50%, we discarded the whole block (as it likely indicates that instructions got mixed up, for instance participants were selecting the smaller instead of the bigger circle).
 
 ```{r p_outliers_errorblock}
+#| eval: false
+
 errorrate |>
   estimate_density(at = c("Illusion_Type", "Block"), method = "KernSmooth") |>
   ggplot(aes(x = x, y = y)) +
@@ -318,9 +322,12 @@ print(paste("Illusion (session 1):", out$text))
 df <- out$data
 ```
 
-### Reaction Time (per Tlock)
+### Reaction Time (per Block)
 
 ```{r outliers_RTtrials}
+#| eval: false
+
+
 check_trials <- function(df) {
   data <- df |>
     mutate(Outlier = ifelse(RT >= 10, TRUE, FALSE)) |>
@@ -384,6 +391,7 @@ check_trials <- function(df) {
 
 ```{r p_outliers_RTtrials}
 #| results: 'asis'
+#| eval: false
 
 out <- check_trials(df)
 out$text
@@ -424,8 +432,8 @@ data.frame(Participant = c("Average"), t(sapply(table[2:ncol(table)], mean, na.r
 ## Final Sample
 
 ```{r}
-dfsub <- filter(dfsub, !Participant %in% outliers)
-df <- filter(df, Participant %in% dfsub$Participant)
+# dfsub <- filter(dfsub, !Participant %in% outliers)
+# df <- filter(df, Participant %in% dfsub$Participant)
 ```
 
 ### Age
