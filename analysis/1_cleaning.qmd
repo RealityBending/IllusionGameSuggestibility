@@ -26,9 +26,9 @@ library(ggside)
 ```{r}
 #| code-fold: false
 
-dfsub <- read.csv("../data/rawdata_participants.csv") |> 
+dfsub <- read.csv("C:/Users/olive/Documents/GitHub/IllusionGameSuggestibility/data/rawdata_participants.csv") |> 
    mutate(across(everything(), ~ifelse(.x == "", NA, .x))) 
-df <- read.csv("../data/rawdata_IllusionGame.csv") |> 
+df <- read.csv("C:/Users/olive/Documents/GitHub/IllusionGameSuggestibility/data/rawdata_IllusionGame.csv") |> 
   group_by(Illusion_Type) |> 
   mutate(Illusion_Effect = ifelse(sign(Illusion_Strength) > 0, "Incongruent", "Congruent"),
          Task_Difficulty = abs(Illusion_Difference),
@@ -274,9 +274,9 @@ plot_distribution(df[df$Participant %in% dfsub$Participant[101:200], ])
 We discarded `r length(outliers)` participants (entirely) and `r length(outliers_half)` participant's second blocks.
 
 ```{r}
-# df <- df |> 
-#   filter(!Participant %in% outliers) |> 
-#   filter(!((Block == "B") & (Participant %in% outliers_half)))
+df <- df |> 
+   filter(!Participant %in% outliers) |> 
+   filter(!((Block == "B") & (Participant %in% outliers_half)))
 ```
 
 
@@ -285,7 +285,6 @@ We discarded `r length(outliers)` participants (entirely) and `r length(outliers
 For each block, we computed the error rate and, if more than 50%, we discarded the whole block (as it likely indicates that instructions got mixed up, for instance participants were selecting the smaller instead of the bigger circle).
 
 ```{r p_outliers_errorblock}
-#| eval: false
 
 errorrate |>
   estimate_density(at = c("Illusion_Type", "Block"), method = "KernSmooth") |>
@@ -325,7 +324,6 @@ df <- out$data
 ### Reaction Time (per Block)
 
 ```{r outliers_RTtrials}
-#| eval: false
 
 
 check_trials <- function(df) {
@@ -391,7 +389,6 @@ check_trials <- function(df) {
 
 ```{r p_outliers_RTtrials}
 #| results: 'asis'
-#| eval: false
 
 out <- check_trials(df)
 out$text
@@ -432,8 +429,8 @@ data.frame(Participant = c("Average"), t(sapply(table[2:ncol(table)], mean, na.r
 ## Final Sample
 
 ```{r}
-# dfsub <- filter(dfsub, !Participant %in% outliers)
-# df <- filter(df, Participant %in% dfsub$Participant)
+dfsub <- filter(dfsub, !Participant %in% outliers)
+df <- filter(df, Participant %in% dfsub$Participant)
 ```
 
 ### Age
@@ -492,19 +489,21 @@ p_edu
 ### Ethnicity
 
 ```{r p_ethnicity}
-ggwaffle::waffle_iron(dfsub, ggwaffle::aes_d(group = Ethnicity), rows=10) |> 
-  ggplot(aes(x, y, fill = group)) + 
-  ggwaffle::geom_waffle() + 
-  coord_equal() + 
-  scale_fill_flat_d() + 
-  ggwaffle::theme_waffle() +
-  labs(title = "Self-reported Ethnicity", subtitle = "Each square represents a participant", fill="")  +
-  theme(
-    plot.title = element_text(size = rel(1.2), face = "bold", hjust = 0),
-    plot.subtitle = element_text(size = rel(1.2)),
-    axis.title.x = element_blank(),
-    axis.title.y = element_blank()
-  )
+# redo ethnicity plot without using ggwaffle
+
+#ggwaffle::waffle_iron(dfsub, ggwaffle::aes_d(group = Ethnicity), rows=10) |> 
+  #ggplot(aes(x, y, fill = group)) + 
+  #ggwaffle::geom_waffle() + 
+  #coord_equal() + 
+  #scale_fill_flat_d() + 
+  #ggwaffle::theme_waffle() +
+  #labs(title = "Self-reported Ethnicity", subtitle = "Each square represents a participant", fill="")  +
+  #theme(
+    #plot.title = element_text(size = rel(1.2), face = "bold", hjust = 0),
+    #plot.subtitle = element_text(size = rel(1.2)),
+    #axis.title.x = element_blank(),
+    #axis.title.y = element_blank()
+  #)
 ```
 
 
@@ -518,6 +517,6 @@ The final sample includes `r report::report_participants(dfsub, age="Age", sex="
 ```{r}
 #| code-fold: false
 
-write.csv(dfsub, "../data/data_participants.csv", row.names = FALSE)
-write.csv(df, "../data/data_IllusionGame.csv", row.names = FALSE)
+write.csv(dfsub, "C:/Users/olive/Documents/GitHub/IllusionGameSuggestibility/data/data_participants.csv", row.names = FALSE)
+write.csv(df, "C:/Users/olive/Documents/GitHub/IllusionGameSuggestibility/data/data_IllusionGame.csv", row.names = FALSE)
 ```

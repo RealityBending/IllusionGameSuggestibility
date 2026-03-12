@@ -654,9 +654,8 @@ sona_credited = [
 
 
 # path = "C:/Users/domma/Box/Data/IllusionGameSuggestibility/"
-path = "C:/Users/dmm56/Box/Data/IllusionGameSuggestibility/"
+path = r"C:/Users/olive/Box/IllusionGameSuggestibility/"
 files = os.listdir(path)
-
 
 # Loop through files ======================================================
 alldata_sub = pd.DataFrame()  # Initialize empty dataframe
@@ -693,7 +692,7 @@ for i, file in enumerate(files):
             experimenter = np.nan
         else:
             experimenter = "Experimenter" + str(int(experimenter))
-    if experimenter == "test":
+    if pd.isna(experimenter) or experimenter in ["TEST", "Test", "test"]:
         continue
 
     df = pd.DataFrame(
@@ -1037,10 +1036,12 @@ alldata_sub["Experimenter"] = alldata_sub["Experimenter"].replace(
         "jl_fa": "Experimenter_JL",
         "jl_me": "Experimenter_JL",
         "jl_pu": "Experimenter_JL",
+        "cale": "Experimenter_C"
     }
 )
 
+
 # Save
-alldata_sub.to_csv("../data/rawdata_participants.csv", index=False)
-alldata_ig.to_csv("../data/rawdata_IllusionGame.csv", index=False)
+alldata_sub.to_csv(r"C:/Users/olive/Documents/GitHub/IllusionGameSuggestibility/data/rawdata_participants.csv", index=False)
+alldata_ig.to_csv(r"C:/Users/olive/Documents/GitHub/IllusionGameSuggestibility/data/rawdata_IllusionGame.csv", index=False)
 print("Done!")
