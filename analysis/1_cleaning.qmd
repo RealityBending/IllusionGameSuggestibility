@@ -229,7 +229,7 @@ outliers_half <- outliers_half[!(outliers_half %in% outliers_full)]
 ```{r}
 p1 <- data_outliers |>
     ggplot(aes(x = p_Error)) +
-    geom_density(aes(colour = Illusion_Type, linetype = Block)) +
+    geom_density(aes(colour = Illusion_Type)) +
     geom_vline(xintercept = 0.45, linetype = "dashed", color = "red")
 
 p1
@@ -240,7 +240,7 @@ p1
 ```{r}
 p2 <- data_outliers |>
     ggplot(aes(x = z_RT)) +
-    geom_density(aes(color = Illusion_Type, linetype = Block)) +
+    geom_density(aes(color = Illusion_Type)) +
     geom_vline(xintercept = 4, linetype = "dashed", color = "red")
 
 p2
@@ -356,7 +356,7 @@ data_kept <- df |>
 ```{r}
 p1 <- data_kept |>
     ggplot(aes(x = p_Error)) +
-    geom_density(aes(colour = Illusion_Type, linetype = Block)) +
+    geom_density(aes(colour = Illusion_Type)) +
     geom_vline(xintercept = 0.45, linetype = "dashed", color = "red")
 
 p1
@@ -367,7 +367,7 @@ p1
 ```{r}
 p2 <- data_kept |>
     ggplot(aes(x = z_RT)) +
-    geom_density(aes(color = Illusion_Type, linetype = Block)) +
+    geom_density(aes(color = Illusion_Type)) +
     geom_vline(xintercept = 4, linetype = "dashed", color = "red")
 
 p2
