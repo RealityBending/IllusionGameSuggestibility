@@ -256,6 +256,11 @@ df <- df |>
    filter(!((Block == "B") & (Participant %in% outliers_half)))
 ```
 
+```{r}
+dfsub <- filter(dfsub, !Participant %in% outliers_full)
+df <- filter(df, Participant %in% dfsub$Participant)
+```
+
 ::: {.panel-tabset}
 
 #### Exclusions Table
@@ -318,11 +323,6 @@ n_removed <- n_before - nrow(df)
 ```
 
 This removed `r n_removed` trials (`r round(n_removed / n_before * 100, 2)`% of total).
-
-```{r}
-dfsub <- filter(dfsub, !Participant %in% outliers_full)
-df <- filter(df, Participant %in% dfsub$Participant)
-```
 
 ```{r}
 # Using original mean and SD (from before exclusion) so z_RT remains on same scale (rather than being refitted to filtered df) - I might have done this incorrectly, though!
@@ -710,7 +710,7 @@ p_eth
 
 :::
 
-## Save
+# Save
 
 ```{r}
 #| code-fold: false
