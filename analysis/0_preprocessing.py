@@ -934,7 +934,7 @@ for i, file in enumerate(files):
     for item in mist:
         df[item] = mist[item]
 
-    alldata_sub = pd.concat([alldata_sub, df], ignore_index=True)
+    alldata_sub = pd.concat([alldata_sub, df], ignore_index=True).copy()
 
     # Illusion Game =====================================================
     ig = data[data["screen"] == "IG_Trial"]
@@ -947,7 +947,9 @@ for i, file in enumerate(files):
     ]
     df_ig["Block"] = ig["block"].values
     df_ig["Trial"] = ig["trial_number"].values
-    df_ig["ISI"] = ig["isi"].values
+    fx = data[data["screen"] == "IG_FixationCross"]
+    fx = fx.iloc[24:] # Remove 24x practice trials
+    df_ig["ISI"] = fx["trial_duration"].values / 1000 # In seconds
     df_ig["RT"] = ig["rt"].values / 1000  # In seconds
     df_ig["Response"] = ig["response"].values
     df_ig["Response_Correct"] = ig["correct_response"].values
@@ -971,8 +973,11 @@ d = d[~np.isin(d["SONA_ID"].values, sona_credited)]
 d.loc[:, "SONA_ID"] = d["SONA_ID"].astype(int).astype(str).values
 d = d.sort_values(by=["SONA_ID", "Block", "Trial"])
 # d = d[[x in ["31852"] for x in d.Participant]]
-sns.kdeplot(data=d[d.Block == "A"], x="RT", hue="SONA_ID", bw_adjust=0.5).set(xlim=(0, 3))
-sns.kdeplot(data=d[d.Block == "B"], x="RT", hue="SONA_ID", bw_adjust=0.5, linestyle="--").set(xlim=(0, 3))
+if len(d) > 0:
+    sns.kdeplot(data=d[d.Block == "A"], x="RT", hue="SONA_ID", bw_adjust=0.5).set(xlim=(0, 3))
+    sns.kdeplot(data=d[d.Block == "B"], x="RT", hue="SONA_ID", bw_adjust=0.5, linestyle="--").set(xlim=(0, 3))
+else:
+    print("No uncredited SONA participants.")
 
 print(d["SONA_ID"].unique())
 # "32009" in alldata_sub["SONA_ID"][~np.isnan(alldata_sub["SONA_ID"])].astype(str).values
